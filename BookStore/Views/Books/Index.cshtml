@@ -1,0 +1,65 @@
+﻿@model IEnumerable<BookStore.Models.Book>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-book"></i>Add Book</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ImageUrl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Author)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                    {
+                        <img src="@item.ImageUrl" alt="@item.Title"
+                             style="width:70px; height:100px; object-fit:cover; border-radius:4px; border:1px solid #ddd;"
+                             crossorigin="anonymous" />
+                    }
+                    else
+                    {
+                        <div style="width:70px; height:100px; background:#f0f0f0; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-image text-muted"></i>
+                        </div>
+                    }
+                </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Author)
+            </td>
+            
+            <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm me-1"><i class="fa-solid fa-pen-to-square"></i></a> <!--edit button-->
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-success btn-sm me-1"><i class="fa-solid fa-circle-info"></i></a> <!--info button-->
+                    <a asp-action="Delete" asp-route-id="@item.Id" class=" btn btn-danger btn-sm me-1"><i class="fa-solid fa-trash-can"></i></a><!--delete button-->
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

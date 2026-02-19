@@ -63,8 +63,10 @@
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
                 <div class="img-thumbnail" style="display:inline-block; padding:10px;">
+                    @* The referrerpolicy attribute is the key to stopping Google from blocking the image *@
                     <img src="@Model.ImageUrl" alt="@Model.Title"
                          style="max-width:300px; height:auto; border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+                         referrerpolicy="no-referrer"
                          crossorigin="anonymous" />
                 </div>
             }

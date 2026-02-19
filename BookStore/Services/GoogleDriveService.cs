@@ -84,7 +84,7 @@ namespace BookStore.Services
 
             // Returns the direct view link
             //return $"https://drive.google.com/uc?export=view&id={uploadedFile.Id}";
-            return $"https://lh3.googleusercontent.com/u/0/d/{uploadedFile.Id}";
+            return $"https://lh3.googleusercontent.com/u/0/d/{uploadedFile.Id}&sz=w1000";
         }
 
         private async Task SetPublicPermission(DriveService service, string fileId)

@@ -33,9 +33,10 @@
                 <td>
                     @if (!string.IsNullOrEmpty(item.ImageUrl))
                     {
-                        <img src="@item.ImageUrl" alt="@item.Title"
-                             style="width:70px; height:100px; object-fit:cover; border-radius:4px; border:1px solid #ddd;"
-                             crossorigin="anonymous" />
+                        <img src="@item.ImageUrl"
+                             alt="@item.Title"
+                             style="width:70px; height:100px; object-fit:cover; border-radius:4px;"
+                             referrerpolicy="no-referrer" />
                     }
                     else
                     {

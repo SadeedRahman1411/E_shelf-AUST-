@@ -47,10 +47,18 @@
             </div>
             <div class="form-group">
                 <label class="control-label">Book Image</label>
-                <input type="file" name="imageFile" class="form-control" />
+                <input type="file" name="imageFile" class="form-control" accept="image/png, image/jpeg, image/jpg" />
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
                     <small class="text-muted">Current image: <a href="@Model.ImageUrl" target="_blank">View</a></small>
+                }
+            </div>
+            <div class="form-group">
+                <label class="control-label">Book PDF</label>
+                <input type="file" name="pdfFile" class="form-control" accept="application/pdf" />
+                @if (!string.IsNullOrEmpty(Model.PdfUrl))
+                {
+                    <small class="text-muted">Current PDF: <a href="@Model.PdfUrl" target="_blank">View File</a></small>
                 }
             </div>
             <div class="form-group">

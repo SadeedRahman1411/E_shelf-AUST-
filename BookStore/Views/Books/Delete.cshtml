@@ -59,6 +59,10 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.ImageUrl)
         </dd>
+        <dt class="col-sm-2">PDF Link</dt>
+        <dd class="col-sm-10">
+            @(string.IsNullOrEmpty(Model.PdfUrl) ? "None" : "File Attached")
+        </dd>
     </dl>
     
     <form asp-action="Delete">

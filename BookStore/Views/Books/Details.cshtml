@@ -75,6 +75,22 @@
                 <span class="text-muted">No image available</span>
             }
         </dd>
+        <dt class="col-sm-2">
+            Book Document
+        </dt>
+        <dd class="col-sm-10">
+            @if (!string.IsNullOrEmpty(Model.PdfUrl))
+            {
+                <a href="@Model.PdfUrl" target="_blank" class="btn btn-outline-danger">
+                    <i class="fa-solid fa-file-pdf fa-2x"></i>
+                    <span class="ms-2">Read / Download PDF</span>
+                </a>
+            }
+            else
+            {
+                <span class="text-muted">No PDF available for this book</span>
+            }
+        </dd>
     </dl>
 </div>
 <div>

@@ -53,7 +53,7 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind("Id,Title,Description,Language,ISBN,DatePublished,Price,Author")] Book book,
-            IFormFile imageFile)
+            IFormFile imageFile, IFormFile pdfFile)
         {
             if (!ModelState.IsValid)
                 return View(book);
@@ -67,6 +67,12 @@ namespace BookStore.Controllers
                 string imageUrl = await _driveService.UploadFileAsync(stream, fileName, imageFile.ContentType);
 
                 book.ImageUrl = imageUrl;
+            }
+
+            if (pdfFile != null && pdfFile.Length > 0)
+            {
+                book.PdfUrl = await _driveService.UploadFileAsync(pdfFile.OpenReadStream(),
+                    $"{Guid.NewGuid()}.pdf", "application/pdf");
             }
 
             _context.Add(book);
@@ -93,24 +99,21 @@ namespace BookStore.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
-            int id,
-            [Bind("Id,Title,Description,Language,ISBN,DatePublished,Price,Author")] Book updatedBook,
-            IFormFile imageFile)
+       int id,
+       [Bind("Id,Title,Description,Language,ISBN,DatePublished,Price,Author")] Book updatedBook,
+       IFormFile? imageFile,
+       IFormFile? pdfFile) // Added pdfFile parameter
         {
-            if (id != updatedBook.Id)
-                return NotFound();
+            if (id != updatedBook.Id) return NotFound();
 
-            if (!ModelState.IsValid)
-                return View(updatedBook);
+            if (!ModelState.IsValid) return View(updatedBook);
 
             var existingBook = await _context.Books.FindAsync(id);
-
-            if (existingBook == null)
-                return NotFound();
+            if (existingBook == null) return NotFound();
 
             try
             {
-                // Update fields
+                // 1. Update text fields
                 existingBook.Title = updatedBook.Title;
                 existingBook.Description = updatedBook.Description;
                 existingBook.Language = updatedBook.Language;
@@ -119,26 +122,31 @@ namespace BookStore.Controllers
                 existingBook.Price = updatedBook.Price;
                 existingBook.Author = updatedBook.Author;
 
-                // Upload new image if provided
+                // 2. ONLY update Image if a new one is uploaded
                 if (imageFile != null && imageFile.Length > 0)
                 {
                     string extension = Path.GetExtension(imageFile.FileName);
                     string fileName = $"{existingBook.Id}_{Guid.NewGuid()}{extension}";
-
                     using var stream = imageFile.OpenReadStream();
-                    string imageUrl = await _driveService.UploadFileAsync(stream, fileName, imageFile.ContentType);
-
-                    existingBook.ImageUrl = imageUrl;
+                    existingBook.ImageUrl = await _driveService.UploadFileAsync(stream, fileName, imageFile.ContentType);
                 }
+                // If imageFile is null, existingBook.ImageUrl remains what it was in the DB
+
+                // 3. ONLY update PDF if a new one is uploaded
+                if (pdfFile != null && pdfFile.Length > 0)
+                {
+                    string fileName = $"{existingBook.Id}_{Guid.NewGuid()}.pdf";
+                    using var stream = pdfFile.OpenReadStream();
+                    existingBook.PdfUrl = await _driveService.UploadFileAsync(stream, fileName, "application/pdf");
+                }
+                // If pdfFile is null, existingBook.PdfUrl remains what it was in the DB
 
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Books.Any(e => e.Id == id))
-                    return NotFound();
-                else
-                    throw;
+                if (!_context.Books.Any(e => e.Id == id)) return NotFound();
+                else throw;
             }
 
             return RedirectToAction(nameof(Index));

@@ -73,18 +73,21 @@ namespace BookStore.Services
             request.Fields = "id";
 
             var uploadResult = await request.UploadAsync();
-
             if (uploadResult.Status == UploadStatus.Failed)
                 throw new Exception($"Google Drive Upload Failed: {uploadResult.Exception?.Message}");
 
             var uploadedFile = request.ResponseBody;
-
-            // Make the file public so it displays on your website
             await SetPublicPermission(service, uploadedFile.Id);
 
-            // Returns the direct view link
-            //return $"https://drive.google.com/uc?export=view&id={uploadedFile.Id}";
-            return $"https://lh3.googleusercontent.com/u/0/d/{uploadedFile.Id}&sz=w1000";
+            // Logic to return different URLs based on file type
+            if (contentType.ToLower().Contains("pdf"))
+            {
+                // This opens the Google Drive PDF viewer
+                return $"https://drive.google.com/file/d/{uploadedFile.Id}/view?usp=sharing";
+            }
+
+            // Existing working image logic
+            return $"https://lh3.googleusercontent.com/d/{uploadedFile.Id}=w1000";
         }
 
         private async Task SetPublicPermission(DriveService service, string fileId)
@@ -98,3 +101,5 @@ namespace BookStore.Services
         }
     }
 }
+
+//hhh

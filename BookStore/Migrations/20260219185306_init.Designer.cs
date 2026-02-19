@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStore.Migrations
 {
     [DbContext(typeof(BookStoreContext))]
-    [Migration("20260218195854_init")]
+    [Migration("20260219185306_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -54,6 +54,9 @@ namespace BookStore.Migrations
 
                     b.Property<string>("Language")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PdfUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")

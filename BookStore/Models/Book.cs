@@ -33,5 +33,8 @@ namespace BookStore.Models
 
         [Display(Name = "Image URL")]
         public string? ImageUrl { get; set; }
+
+        [Display(Name = "PDF URL")]
+        public string? PdfUrl { get; set; }
     }
 }

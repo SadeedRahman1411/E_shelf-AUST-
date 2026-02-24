@@ -1,0 +1,63 @@
+﻿@model IEnumerable<BookStore.Models.Book>
+
+@{
+    ViewData["Title"] = "Store";
+}
+
+<h1 class="text-center my-4">Catalogue</h1>
+
+<div class="container">
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 transition-hover position-relative">
+                    @* 1. Wrap the top part of the card in a link to Details *@
+                    <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title"
+                                 style="height: 320px; object-fit: cover;" referrerpolicy="no-referrer">
+                        }
+                        else
+                        {
+                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 320px;">
+                                <i class="fa-solid fa-image fa-3x text-muted"></i>
+                            </div>
+                        }
+
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-truncate">@item.Title</h5>
+                            <p class="card-text text-muted small">By @item.Author</p>
+                            <h6 class="text-primary fw-bold">@item.Price.ToString("C")</h6>
+                        </div>
+                    </a>
+
+                    @* 2. The footer stays separate so buttons are still clickable independently *@
+                    <div class="card-footer bg-transparent border-0 pb-3">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-danger btn-sm">
+                                <i class="fa-solid fa-cart-arrow-down"></i> Add to Cart
+                            </button>
+                            <button class="btn btn-success btn-sm">
+                                <i class="fa-solid fa-bag-shopping me-2"></i>Purchase Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .transition-hover {
+        transition: 0.3s ease;
+    }
+
+        .transition-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12) !important;
+            cursor: pointer;
+        }
+</style>

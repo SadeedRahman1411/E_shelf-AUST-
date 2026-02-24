@@ -163,7 +163,7 @@ namespace BookStore.Controllers
             if (book == null)
                 return NotFound();
 
-            return View(book);
+            return View(book);//generates the front end pages folder
         }
 
         // POST: Books/Delete/5

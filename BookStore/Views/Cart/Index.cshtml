@@ -1,0 +1,70 @@
+﻿@model BookStore.Models.Cart
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="fa-solid fa-cart-shopping me-2"></i>Your Cart</h1>
+
+    @if (Model.CartItems != null && Model.CartItems.Any())
+    {
+        <table class="table align-middle shadow-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Cover</th>
+                    <th>Book</th>
+                    <th class="text-end">Price</th>
+                    <th class="text-center">Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.CartItems)
+                {
+                    <tr>
+                        <td style="width: 100px;">
+                            <a asp-controller="Store" asp-action="Details" asp-route-id="@item.Book.Id">
+                                <img src="@item.Book.ImageUrl" alt="@item.Book.Title"
+                                     style="height: 80px; width: 60px; object-fit: cover; border-radius: 4px;"
+                                     referrerpolicy="no-referrer">
+                            </a>
+                        </td>
+                        <td>
+                            <a class="text-decoration-none fw-bold text-dark" asp-controller="Store" asp-action="Details" asp-route-id="@item.Book.Id">
+                                @item.Book.Title
+                            </a>
+                            <br />
+                            <small class="text-muted">By @item.Book.Author</small>
+                        </td>
+                        <td class="text-end">
+                            @item.Book.Price.ToString("c")
+                        </td>
+                        <td class="text-center">
+                            <a asp-controller="Cart" asp-action="RemoveFromCart" asp-route-id="@item.Id" class="text-danger">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <td colspan="2" class="text-end"><strong>Total:</strong></td>
+                    <td class="text-end text-success">
+                        <strong>@Model.GetCartTotal().ToString("c")</strong>
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fa-solid fa-cart-arrow-down fa-4x text-muted mb-3"></i>
+            <h3 class="text-muted">Your cart is currently empty</h3>
+            <a asp-controller="Store" asp-action="Index" class="btn btn-primary mt-3">Browse Catalogue</a>
+        </div>
+    }
+</div>

@@ -10,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+//new stuff
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+//new stuff
+
 // Add DbContext
 builder.Services.AddDbContext<BookStoreContext>(options =>
     options.UseSqlServer(
@@ -17,6 +21,21 @@ builder.Services.AddDbContext<BookStoreContext>(options =>
         ?? throw new InvalidOperationException("Connection string 'BookStoreContext' not found.")
     )
 );
+
+//new stuff
+builder.Services.AddScoped<Cart>(sp => Cart.GetCart(sp));
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+});
+
+//new stuff
 
 // Register GoogleDriveService (ONLY ONCE)
 builder.Services.AddScoped<GoogleDriveService>();
@@ -51,11 +70,14 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseSession();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"
+    pattern: "{controller=Store}/{action=Index}/{id?}"
 );
 
 app.Run();

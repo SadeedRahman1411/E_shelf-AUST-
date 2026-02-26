@@ -1,4 +1,5 @@
 ﻿@model BookStore.Models.Book
+@inject BookStore.Models.Cart CartService
 
 @{
     ViewData["Title"] = "Book Details";
@@ -46,9 +47,18 @@
                     <h3 class="text-success my-3">@Model.Price.ToString("C")</h3>
 
                     <div class="d-flex gap-2 my-4">
-                        <button class="btn btn-primary btn-lg px-4">
-                            <i class="fa-solid fa-cart-arrow-down me-2"></i>Add to Cart
-                        </button>
+                        @if (CartService.IsBookInCart(Model.Id))
+                        {
+                            <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-primary btn-lg px-4">
+                                <i class="fa-solid fa-circle-check me-2"></i>In Cart
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model.Id" class="btn btn-primary btn-lg px-4">
+                                <i class="fa-solid fa-cart-arrow-down me-2"></i>Add to Cart
+                            </a>
+                        }
                         <button class="btn btn-success btn-lg px-4">
                             <i class="fa-solid fa-bag-shopping me-2"></i>Purchase Now
                         </button>

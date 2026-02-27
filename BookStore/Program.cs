@@ -1,14 +1,16 @@
-﻿using BookStore.Models;
+using BookStore.Models;
 using BookStore.Data;
 using BookStore.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 //new stuff
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -21,6 +23,8 @@ builder.Services.AddDbContext<BookStoreContext>(options =>
         ?? throw new InvalidOperationException("Connection string 'BookStoreContext' not found.")
     )
 );
+
+builder.Services.AddDefaultIdentity<DefaultUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<BookStoreContext>();
 
 //new stuff
 builder.Services.AddScoped<Cart>(sp => Cart.GetCart(sp));
@@ -73,11 +77,15 @@ app.UseRouting();
 
 app.UseSession();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Store}/{action=Index}/{id?}"
 );
+
+app.MapRazorPages();
 
 app.Run();

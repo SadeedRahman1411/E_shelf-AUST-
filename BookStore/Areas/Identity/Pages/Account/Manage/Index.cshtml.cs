@@ -56,6 +56,17 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; }
+
+
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
@@ -70,6 +81,8 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
                 PhoneNumber = phoneNumber
             };
         }
@@ -111,6 +124,28 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
                 }
             }
 
+            if(Input.FirstName != user.FirstName)
+            {
+                user.FirstName = Input.FirstName;
+                var setFirstNameResult = await _userManager.UpdateAsync(user);
+                if (!setFirstNameResult.Succeeded)
+                {
+                    StatusMessage = "Unexpected error when trying to set first name.";
+                    return RedirectToPage();
+                }
+            }
+            if (Input.LastName != user.LastName)
+            {
+                user.LastName = Input.LastName;
+                var setLastNameResult = await _userManager.UpdateAsync(user);
+                if (!setLastNameResult.Succeeded)
+                {
+                    StatusMessage = "Unexpected error when trying to set last name.";
+                    return RedirectToPage();
+                }
+            }
+
+            await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();

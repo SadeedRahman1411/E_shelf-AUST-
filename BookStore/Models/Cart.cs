@@ -1,5 +1,6 @@
 ﻿using BookStore.Data;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography.Xml;
 
 namespace BookStore.Models
@@ -15,6 +16,11 @@ namespace BookStore.Models
 
         public string Id { get; set; }
 
+        public string UserId { get; set; }   // FK
+
+        [ForeignKey("UserId")]
+        public DefaultUser User { get; set; }
+
         public List<CartItem> CartItems { get; set; }
 
 
@@ -23,26 +29,11 @@ namespace BookStore.Models
             var httpContext = services.GetRequiredService<IHttpContextAccessor>()?.HttpContext;
             var context = services.GetService<BookStoreContext>();
 
-            // 1. Try to get the CartId from a COOKIE instead of Session
-            string cartId = httpContext.Request.Cookies["CartId"];
+            var userId = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            // 2. If the cookie doesn't exist, create a new ID and save it in a 30-day cookie
-            if (string.IsNullOrEmpty(cartId))
-            {
-                cartId = Guid.NewGuid().ToString();
-
-                CookieOptions options = new CookieOptions
-                {
-                    Expires = DateTime.Now.AddDays(30),
-                    HttpOnly = true, // Security: prevents JS access
-                    IsEssential = true // Required for the app to function
-                };
-
-                httpContext.Response.Cookies.Append("CartId", cartId, options);
-            }
-
-            return new Cart(context) { Id = cartId };
+            return new Cart(context) { Id = userId };
         }
+
         public List<CartItem> GetAllCartItems()
         {
             return CartItems ??

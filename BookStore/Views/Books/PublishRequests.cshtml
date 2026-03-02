@@ -1,0 +1,51 @@
+﻿@model List<BookStore.Models.Book>
+
+@{
+    ViewData["Title"] = "Publish Requests";
+}
+
+<h2>Publish Requests</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Publisher</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>
+                    @if (book.Publisher != null)
+                    {
+                        @($"{book.Publisher.FirstName} {book.Publisher.LastName}")
+                    }
+                    else
+                    {
+                        <span class="text-muted">Unknown</span>
+                    }
+                </td>
+
+                <td>
+
+                    <form asp-action="Approve" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@book.Id" />
+                        <button type="submit" class="btn btn-success">Approve</button>
+                    </form>
+
+                    <form asp-action="Reject" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@book.Id" />
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </form>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

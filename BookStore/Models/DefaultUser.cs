@@ -15,6 +15,9 @@ namespace BookStore.Models
         public string? LastName { get; set; }
 
         [PersonalData]
+        public string? ProfileImageUrl { get; set; }
+
+        [PersonalData]
         [DataType(DataType.Date)]
         public DateTime UserCreation { get; set; } = DateTime.Now;
     }

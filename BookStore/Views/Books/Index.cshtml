@@ -24,6 +24,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Author)
             </th>
+            <th>
+                Status
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -54,7 +57,16 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Author)
             </td>
-            
+                <td>
+                    @if (item.Status == BookStore.Models.BookStatus.Allowed)
+                    {
+                        <span class="badge bg-success">Allowed</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Queued</span>
+                    }
+                </td>
             <td>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm me-1"><i class="fa-solid fa-pen-to-square"></i></a> <!--edit button-->
                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-success btn-sm me-1"><i class="fa-solid fa-circle-info"></i></a> <!--info button-->

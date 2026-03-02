@@ -3,14 +3,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using BookStore.Data;
 using BookStore.Models;
 using BookStore.Services;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
+    [Authorize(Roles = "Publisher,Admin")]
     public class BooksController : Controller
     {
         private readonly BookStoreContext _context;
@@ -25,7 +28,18 @@ namespace BookStore.Controllers
         // GET: Books
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Books.ToListAsync());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (User.IsInRole("Admin"))
+            {
+                return View(await _context.Books.ToListAsync());
+            }
+            else
+            {
+                var userBooks = await _context.Books.Where(b => b.PublisherId == userId).ToListAsync();
+                return View(userBooks);
+            }
+            //return View(await _context.Books.ToListAsync());
         }
 
         // GET: Books/Details/5
@@ -57,6 +71,11 @@ namespace BookStore.Controllers
         {
             if (!ModelState.IsValid)
                 return View(book);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            book.PublisherId = userId;
+            book.Status = BookStatus.Queued;
 
             if (imageFile != null && imageFile.Length > 0)
             {
@@ -180,5 +199,47 @@ namespace BookStore.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> PublishRequests()
+        {
+            var queuedBooks = await _context.Books
+                .Include(b => b.Publisher)
+                .Where(b => b.Status == BookStatus.Queued)
+                .ToListAsync();
+
+            return View(queuedBooks);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Approve(int id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book != null)
+            {
+                book.Status = BookStatus.Allowed;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(PublishRequests));
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reject(int id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book != null)
+            {
+                _context.Books.Remove(book);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(PublishRequests));
+        }
+
     }
 }

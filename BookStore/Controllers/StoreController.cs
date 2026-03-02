@@ -1,9 +1,13 @@
 ﻿using BookStore.Data;
+using BookStore.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace BookStore.Controllers
 {
+    [Authorize(Roles = "Reader,Admin")]
     public class StoreController : Controller
     {
         private readonly BookStoreContext _context;
@@ -14,7 +18,11 @@ namespace BookStore.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Books.ToListAsync());
+            var allowedBooks = await _context.Books
+         .Where(b => b.Status == BookStatus.Allowed)
+         .ToListAsync();
+
+            return View(allowedBooks);
         }
 
         public async Task<IActionResult> Details(int? id)

@@ -36,5 +36,12 @@ namespace BookStore.Models
 
         [Display(Name = "PDF URL")]
         public string? PdfUrl { get; set; }
+
+        public BookStatus Status { get; set; } = BookStatus.Queued;
+
+        public string? PublisherId { get; set; }
+
+        [ForeignKey("PublisherId")]
+        public DefaultUser? Publisher { get; set; }
     }
 }

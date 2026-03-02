@@ -13,7 +13,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 //new stuff
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpContextAccessor();
 //new stuff
 
 // Add DbContext
@@ -24,7 +24,15 @@ builder.Services.AddDbContext<BookStoreContext>(options =>
     )
 );
 
-builder.Services.AddDefaultIdentity<DefaultUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<BookStoreContext>();
+builder.Services.AddIdentity<DefaultUser, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true;
+})
+.AddEntityFrameworkStores<BookStoreContext>()
+.AddDefaultTokenProviders()
+.AddDefaultUI();
+
+builder.Services.AddAuthorization();
 
 //new stuff
 builder.Services.AddScoped<Cart>(sp => Cart.GetCart(sp));
@@ -46,6 +54,21 @@ builder.Services.AddScoped<GoogleDriveService>();
 
 // Build the app
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string[] roles = { "Reader", "Publisher", "Admin" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
 
 // Seed database
 using (var scope = app.Services.CreateScope())

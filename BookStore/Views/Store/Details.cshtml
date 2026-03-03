@@ -3,6 +3,10 @@
 
 @{
     ViewData["Title"] = "Book Details";
+    var purchased = ViewBag.PurchasedBookIds as List<int>;
+    bool isOwned = User.IsInRole("Reader") &&
+                   purchased != null &&
+                   purchased.Contains(Model.Id);
 }
 
 <div class="container mt-4">
@@ -29,39 +33,60 @@
                             <p class="text-muted mt-2">No Image Available</p>
                         </div>
                     }
-                    
-                    @if (!string.IsNullOrEmpty(Model.PdfUrl))
-                    {
-                        <div class="mt-3">
-                            <a href="@Model.PdfUrl" target="_blank" class="btn btn-sm btn-outline-danger w-100">
-                                <i class="fa-solid fa-file-pdf"></i> Preview Digital Copy
-                            </a>
-                        </div>
-                    }
+
+                    @* 🔥 PDF PREVIEW REMOVED FROM STORE DETAILS *@
                 </div>
 
                 <div class="col-md-8 ps-md-4">
                     <h2 class="display-6">@Model.Title</h2>
                     <p class="lead text-muted">by @Model.Author</p>
-                    
+
                     <h3 class="text-success my-3">@Model.Price.ToString("C")</h3>
 
                     <div class="d-flex gap-2 my-4">
-                        @if (CartService.IsBookInCart(Model.Id))
+
+                        @if (isOwned)
                         {
-                            <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-primary btn-lg px-4">
-                                <i class="fa-solid fa-circle-check me-2"></i>In Cart
+                            <a asp-controller="Reader"
+                               asp-action="PurchasedBooks"
+                               class="btn btn-secondary btn-lg px-4">
+                                <i class="fa-solid fa-book me-2"></i>Go to My Books
                             </a>
                         }
                         else
                         {
-                            <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model.Id" class="btn btn-primary btn-lg px-4">
-                                <i class="fa-solid fa-cart-arrow-down me-2"></i>Add to Cart
-                            </a>
+                            @if (CartService.IsBookInCart(Model.Id))
+                            {
+                                <a asp-controller="Cart"
+                                   asp-action="Index"
+                                   class="btn btn-outline-primary btn-lg px-4">
+                                    <i class="fa-solid fa-circle-check me-2"></i>In Cart
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Cart"
+                                   asp-action="AddToCart"
+                                   asp-route-id="@Model.Id"
+                                   class="btn btn-primary btn-lg px-4">
+                                    <i class="fa-solid fa-cart-arrow-down me-2"></i>Add to Cart
+                                </a>
+                            }
+
+                            @if (User.IsInRole("Reader"))
+                            {
+                                <form asp-controller="Cart"
+                                      asp-action="PurchaseSingle"
+                                      method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="bookId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-success btn-lg px-4">
+                                        <i class="fa-solid fa-bag-shopping me-2"></i>Purchase Now
+                                    </button>
+                                </form>
+                            }
                         }
-                        <button class="btn btn-success btn-lg px-4">
-                            <i class="fa-solid fa-bag-shopping me-2"></i>Purchase Now
-                        </button>
+
                     </div>
 
                     <hr />
@@ -71,16 +96,24 @@
                         <dd class="col-sm-9">@Html.DisplayFor(model => model.Author)</dd>
 
                         <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
-                        <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Description) ? "No description provided." : Model.Description)</dd>
+                        <dd class="col-sm-9">
+                            @(string.IsNullOrEmpty(Model.Description)
+                                                        ? "No description provided."
+                                                        : Model.Description)
+                        </dd>
 
                         <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Language)</dt>
                         <dd class="col-sm-9">@Html.DisplayFor(model => model.Language)</dd>
 
                         <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ISBN)</dt>
-                        <dd class="col-sm-9"><code>@Html.DisplayFor(model => model.ISBN)</code></dd>
+                        <dd class="col-sm-9">
+                            <code>@Html.DisplayFor(model => model.ISBN)</code>
+                        </dd>
 
                         <dt class="col-sm-3">@Html.DisplayNameFor(model => model.DatePublished)</dt>
-                        <dd class="col-sm-9">@Model.DatePublished.ToString("MMMM dd, yyyy")</dd>
+                        <dd class="col-sm-9">
+                            @Model.DatePublished.ToString("MMMM dd, yyyy")
+                        </dd>
                     </dl>
                 </div>
             </div>

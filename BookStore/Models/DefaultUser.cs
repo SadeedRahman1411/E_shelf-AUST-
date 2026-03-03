@@ -17,6 +17,10 @@ namespace BookStore.Models
         [PersonalData]
         public string? ProfileImageUrl { get; set; }
 
+        public List<Book> PurchasedBooks { get; set; } = new List<Book>();
+
+        public decimal Wallet { get; set; } = 0.00m;
+
         [PersonalData]
         [DataType(DataType.Date)]
         public DateTime UserCreation { get; set; } = DateTime.Now;

@@ -1,0 +1,64 @@
+﻿@model List<BookStore.Models.Book>
+
+@{
+    ViewData["Title"] = "My Purchased Books";
+}
+
+<h2>My Purchased Books</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You have not purchased any books yet.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Price</th>
+                <th>Digital Copy</th> <!-- 🔥 Added -->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in Model)
+            {
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(book.ImageUrl))
+                        {
+                            <img src="@book.ImageUrl"
+                                 style="width:60px;height:90px;object-fit:cover;"
+                                 referrerpolicy="no-referrer" />
+                        }
+                    </td>
+
+                    <td>@book.Title</td>
+                    <td>@book.Author</td>
+                    <td>@book.Price.ToString("C")</td>
+
+                    <!-- 🔥 PDF MOVED HERE -->
+                    <td>
+                        @if (!string.IsNullOrEmpty(book.PdfUrl))
+                        {
+                            <a href="@book.PdfUrl"
+                               target="_blank"
+                               class="btn btn-sm btn-outline-danger"
+                               referrerpolicy="no-referrer">
+                                <i class="fa-solid fa-file-pdf me-1"></i>View PDF
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">Not Available</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

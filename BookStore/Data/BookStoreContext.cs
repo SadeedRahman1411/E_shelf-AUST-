@@ -15,7 +15,32 @@ namespace BookStore.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Book>()
+           .HasOne(b => b.Publisher)
+           .WithMany() // Publisher does NOT need PublishedBooks list
+           .HasForeignKey(b => b.PublisherId)
+           .OnDelete(DeleteBehavior.Restrict);
+
+            // Reader ↔ PurchasedBooks (Many-to-Many)
+            modelBuilder.Entity<DefaultUser>()
+            .HasMany(u => u.PurchasedBooks)
+            .WithMany(b => b.Purchasers)
+            .UsingEntity(j => j.ToTable("UserPurchasedBooks"));
+
+            modelBuilder.Entity<DefaultUser>()
+            .Property(u => u.Wallet)
+            .HasColumnType("decimal(18,2)");
+
+
+        }
+
+
         public DbSet<Book> Books { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
     }
+
 }

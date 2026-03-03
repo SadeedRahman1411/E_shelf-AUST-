@@ -2,6 +2,7 @@
 @inject BookStore.Models.Cart CartService
 @{
     ViewData["Title"] = "Store";
+    var purchased = ViewBag.PurchasedBookIds as List<int>;
 }
 
 <h1 class="text-center my-4">Catalogue</h1>
@@ -12,7 +13,7 @@
         {
             <div class="col">
                 <div class="card h-100 shadow-sm border-0 transition-hover position-relative">
-                    @* 1. Wrap the top part of the card in a link to Details *@
+
                     <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
                         @if (!string.IsNullOrEmpty(item.ImageUrl))
                         {
@@ -33,27 +34,59 @@
                         </div>
                     </a>
 
-                    @* 2. The footer stays separate so buttons are still clickable independently *@
                     <div class="card-footer bg-transparent border-0 pb-3">
                         <div class="d-grid gap-2">
-                            @if (CartService.IsBookInCart(item.Id))
+
+                            @* 🔥 IF READER AND ALREADY PURCHASED *@
+                            @if (User.IsInRole("Reader") &&
+                                                    purchased != null &&
+                                                    purchased.Contains(item.Id))
                             {
-                                <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-primary btn-sm">
-                                    <i class="fa-solid fa-circle-check"></i> In Cart
+                                <a asp-controller="Reader"
+                                   asp-action="PurchasedBooks"
+                                   class="btn btn-secondary btn-sm">
+                                    <i class="fa-solid fa-book me-2"></i>Go to My Books
                                 </a>
                             }
                             else
                             {
-                                <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@item.Id" class="btn btn-danger btn-sm">
-                                    <i class="fa-solid fa-cart-arrow-down"></i> Add to Cart
-                                </a>
+                                @* 🔥 NORMAL CART LOGIC (UNCHANGED) *@
+                                @if (CartService.IsBookInCart(item.Id))
+                                {
+                                    <a asp-controller="Cart"
+                                       asp-action="Index"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fa-solid fa-circle-check"></i> In Cart
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Cart"
+                                       asp-action="AddToCart"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-danger btn-sm">
+                                        <i class="fa-solid fa-cart-arrow-down"></i> Add to Cart
+                                    </a>
+                                }
+
+                                @* 🔥 PURCHASE NOW BUTTON (POST FORM) *@
+                                @if (User.IsInRole("Reader"))
+                                {
+                                    <form asp-controller="Cart"
+                                          asp-action="PurchaseSingle"
+                                          method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="bookId" value="@item.Id" />
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="fa-solid fa-bag-shopping me-2"></i>Purchase Now
+                                        </button>
+                                    </form>
+                                }
                             }
 
-                            <button class="btn btn-success btn-sm">
-                                <i class="fa-solid fa-bag-shopping me-2"></i>Purchase Now
-                            </button>
                         </div>
                     </div>
+
                 </div>
             </div>
         }

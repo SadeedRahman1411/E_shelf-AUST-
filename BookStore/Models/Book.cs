@@ -31,6 +31,9 @@ namespace BookStore.Models
         [Required]
         public string Author { get; set; }
 
+        // Many readers can purchase one book
+        public List<DefaultUser> Purchasers { get; set; } = new List<DefaultUser>();
+
         [Display(Name = "Image URL")]
         public string? ImageUrl { get; set; }
 

@@ -1,0 +1,14 @@
+﻿@model BookStore.Models.DefaultUser
+
+@{
+    ViewData["Title"] = "Wallet";
+}
+
+<h2>Publisher Wallet</h2>
+
+<div class="card p-4">
+    <h4>Current Balance:</h4>
+    <h2 class="text-success">
+        $ @Model.Wallet
+    </h2>
+</div>

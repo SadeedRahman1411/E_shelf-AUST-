@@ -72,9 +72,7 @@
                                 @* 🔥 PURCHASE NOW BUTTON (POST FORM) *@
                                 @if (User.IsInRole("Reader"))
                                 {
-                                    <form asp-controller="Cart"
-                                          asp-action="PurchaseSingle"
-                                          method="post">
+                                    <form asp-controller="Cart" asp-action="PurchaseSingle" method="post">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="bookId" value="@item.Id" />
                                         <button type="submit" class="btn btn-success btn-sm">

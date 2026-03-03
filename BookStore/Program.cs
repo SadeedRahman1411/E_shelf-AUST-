@@ -5,12 +5,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Configuration
+    .AddJsonFile("credentials/stripe.json", optional: true);
+
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 //new stuff
 builder.Services.AddHttpContextAccessor();

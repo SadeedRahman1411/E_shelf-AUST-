@@ -14,7 +14,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Configuration
-    .AddJsonFile("credentials/stripe.json", optional: true);
+    .AddJsonFile("wwwroot/credentials/stripe.json", optional: true);
 
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 

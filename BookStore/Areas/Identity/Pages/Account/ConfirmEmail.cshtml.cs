@@ -17,11 +17,13 @@ namespace BookStore.Areas.Identity.Pages.Account
 {
     public class ConfirmEmailModel : PageModel
     {
+        private readonly SignInManager<DefaultUser> _signInManager;
         private readonly UserManager<DefaultUser> _userManager;
 
-        public ConfirmEmailModel(UserManager<DefaultUser> userManager)
+        public ConfirmEmailModel(UserManager<DefaultUser> userManager, SignInManager<DefaultUser> signInManager)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -38,14 +40,24 @@ namespace BookStore.Areas.Identity.Pages.Account
             }
 
             var user = await _userManager.FindByIdAsync(userId);
+            
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{userId}'.");
             }
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
+
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(user, isPersistent: false);
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            StatusMessage = "Error confirming your email.";
             return Page();
         }
     }

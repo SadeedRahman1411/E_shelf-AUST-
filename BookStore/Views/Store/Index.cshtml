@@ -1,11 +1,35 @@
 ﻿@model IEnumerable<BookStore.Models.Book>
 @inject BookStore.Models.Cart CartService
+
 @{
     ViewData["Title"] = "Store";
     var purchased = ViewBag.PurchasedBookIds as List<int>;
 }
 
 <h1 class="text-center my-4">Catalogue</h1>
+
+<!-- 🔎 SEARCH BAR -->
+
+<div class="container mb-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <form method="get" class="d-flex">
+                <input type="text"
+                       name="searchString"
+                       value="@ViewBag.CurrentSearch"
+                       class="form-control me-2"
+                       placeholder="Search by book title..." />
+
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+
+</div>
 
 <div class="container">
     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
@@ -14,6 +38,7 @@
             <div class="col">
                 <div class="card h-100 shadow-sm border-0 transition-hover position-relative">
 
+                    
                     <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
                         @if (!string.IsNullOrEmpty(item.ImageUrl))
                         {
@@ -50,10 +75,6 @@
                             }
                             else
                             {
-                                @* 🔥 NORMAL CART LOGIC (UNCHANGED) *@
-                               
-
-                                @* 🔥 PURCHASE NOW BUTTON (POST FORM) *@
                                 @if (User.IsInRole("Reader"))
                                 {
                                     @if (CartService.IsBookInCart(item.Id))
@@ -73,6 +94,7 @@
                                             <i class="fa-solid fa-cart-arrow-down"></i> Add to Cart
                                         </a>
                                     }
+
                                     <form asp-controller="Cart" asp-action="PurchaseSingle" method="post">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="bookId" value="@item.Id" />
@@ -90,7 +112,36 @@
             </div>
         }
     </div>
+    
+
 </div>
+
+<!-- 📄 PAGINATION -->
+@if (ViewBag.TotalPages > 1)
+{
+    <div class="d-flex justify-content-center mt-4">
+        <nav>
+            <ul class="pagination">
+
+                
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-searchString="@ViewBag.CurrentSearch">
+                            @i
+                        </a>
+                    </li>
+                }
+
+        </ul>
+    </nav>
+</div>
+
+
+}
 
 <style>
     .transition-hover {

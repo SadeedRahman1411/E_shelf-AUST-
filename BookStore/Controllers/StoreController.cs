@@ -20,32 +20,51 @@ namespace BookStore.Controllers
             _userManager = userManager;
         }
         /*
-        public async Task<IActionResult> Index()
-        {
-            var allowedBooks = await _context.Books
-         .Where(b => b.Status == BookStatus.Allowed)
-         .ToListAsync();
+          public async Task<IActionResult> Index()
+          {
+              var books = await _context.Books
+                  .Where(b => b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported)
+                  .ToListAsync();
 
-            return View(allowedBooks);
-        }
+              if (User.IsInRole("Reader"))
+              {
+                  var userId = _userManager.GetUserId(User);
 
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-                return NotFound();
+                  var user = await _context.Users
+                      .Include(u => u.PurchasedBooks)
+                      .FirstOrDefaultAsync(u => u.Id == userId);
 
-            var book = await _context.Books.FirstOrDefaultAsync(m => m.Id == id);
+                  ViewBag.PurchasedBookIds = user?.PurchasedBooks
+                      .Select(b => b.Id)
+                      .ToList() ?? new List<int>();
+              }
+              else
+              {
+                  ViewBag.PurchasedBookIds = new List<int>();
+              }
 
-            if (book == null)
-                return NotFound();
-
-            return View(book);
-        }
+              return View(books);
+          }
         */
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, int page = 1)
         {
-            var books = await _context.Books
-                .Where(b => b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported)
+            int pageSize = 8;
+
+            var query = _context.Books
+                .Where(b => b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported);
+
+            // 🔍 SEARCH BY BOOK TITLE
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(b => b.Title.Contains(searchString));
+            }
+
+            int totalBooks = await query.CountAsync();
+
+            var books = await query
+                .OrderBy(b => b.Title)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             if (User.IsInRole("Reader"))
@@ -65,9 +84,12 @@ namespace BookStore.Controllers
                 ViewBag.PurchasedBookIds = new List<int>();
             }
 
+            ViewBag.CurrentSearch = searchString;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalBooks / pageSize);
+
             return View(books);
         }
-
         public async Task<IActionResult> Details(int id)
         {
             var book = await _context.Books

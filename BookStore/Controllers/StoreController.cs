@@ -48,7 +48,7 @@ namespace BookStore.Controllers
         */
         public async Task<IActionResult> Index(string searchString, int page = 1)
         {
-            int pageSize = 8;
+            int pageSize = 5;
 
             var query = _context.Books
                 .Where(b => b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported);

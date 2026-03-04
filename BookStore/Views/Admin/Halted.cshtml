@@ -1,0 +1,31 @@
+﻿@model IEnumerable<BookStore.Models.Book>
+
+<h2>Halted Books</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>@book.Author</td>
+
+                <td>
+                    <form asp-action="Unban" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@book.Id" />
+                        <button class="btn btn-success">Unban</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

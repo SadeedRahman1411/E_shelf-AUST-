@@ -45,7 +45,7 @@ namespace BookStore.Controllers
         public async Task<IActionResult> Index()
         {
             var books = await _context.Books
-                .Where(b => b.Status == BookStatus.Allowed)
+                .Where(b => b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported)
                 .ToListAsync();
 
             if (User.IsInRole("Reader"))
@@ -90,6 +90,25 @@ namespace BookStore.Controllers
             }
 
             return View(book);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Reader")]
+        public async Task<IActionResult> ReportBook(int id)
+        {
+            var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book == null)
+                return NotFound();
+
+            if (book.Status == BookStatus.Allowed)
+            {
+                book.Status = BookStatus.Reported;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Details", new { id = id });
         }
     }
 }

@@ -1,0 +1,37 @@
+﻿@model IEnumerable<BookStore.Models.Book>
+
+<h2>Reported Books</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>@book.Author</td>
+
+                <td>
+                    <form asp-action="AcceptReport" method="post" style="display:inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@book.Id" />
+                        <button class="btn btn-danger">Accept Report</button>
+                    </form>
+
+                    <form asp-action="DenyReport" method="post" style="display:inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@book.Id" />
+                        <button class="btn btn-success">Deny</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -2,7 +2,9 @@
 {
     public enum BookStatus
     {
-        Queued = 0,
-        Allowed = 1
+        Queued,
+        Allowed,
+        Reported,
+        Report_Ack
     }
 }

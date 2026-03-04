@@ -34,7 +34,7 @@
                         </div>
                     }
 
-                    @* 🔥 PDF PREVIEW REMOVED FROM STORE DETAILS *@
+                    
                 </div>
 
                 <div class="col-md-8 ps-md-4">
@@ -80,6 +80,17 @@
                                     <input type="hidden" name="bookId" value="@Model.Id" />
                                     <button type="submit" class="btn btn-success btn-lg px-4">
                                         <i class="fa-solid fa-bag-shopping me-2"></i>Purchase Now
+                                    </button>
+                                </form>
+                            }
+
+                            @if (User.IsInRole("Reader") && Model.Status == BookStore.Models.BookStatus.Allowed)
+                            {
+                                <form asp-controller="Store" asp-action="ReportBook" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-warning btn-lg px-4">
+                                        <i class="fa-solid fa-flag me-2"></i>Report Book
                                     </button>
                                 </form>
                             }

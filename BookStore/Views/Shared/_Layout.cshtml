@@ -57,7 +57,17 @@
                         }
                     </ul>
                     <partial name ="_LoginPartial" />
-                    <a class="nav-link text-dark float-right" asp-area="" asp-controller="Cart" asp-action="Index"><i class="fa-solid fa-cart-shopping"></i></a>
+                    
+
+                    @if (User.IsInRole("Reader"))
+                    {
+                        <a class="nav-link text-dark float-right"
+                           asp-area=""
+                           asp-controller="Cart"
+                           asp-action="Index">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </a>
+                    }
                 </div>
             </div>
         </nav>

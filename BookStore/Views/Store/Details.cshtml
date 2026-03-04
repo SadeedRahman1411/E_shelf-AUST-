@@ -34,6 +34,16 @@
                         </div>
                     }
 
+                     @if (User.IsInRole("Admin") && !string.IsNullOrEmpty(Model.PdfUrl))
+                     {
+                        <div class="mt-3">
+                            <a href="@Model.PdfUrl"
+                                target="_blank"
+                                class="btn btn-outline-danger btn-sm w-100">
+                                <i class="fa-solid fa-file-pdf"></i> View PDF
+                            </a>
+                        </div>
+                     }
                     
                 </div>
 
@@ -55,26 +65,26 @@
                         }
                         else
                         {
-                            @if (CartService.IsBookInCart(Model.Id))
-                            {
-                                <a asp-controller="Cart"
-                                   asp-action="Index"
-                                   class="btn btn-outline-primary btn-lg px-4">
-                                    <i class="fa-solid fa-circle-check me-2"></i>In Cart
-                                </a>
-                            }
-                            else
-                            {
-                                <a asp-controller="Cart"
-                                   asp-action="AddToCart"
-                                   asp-route-id="@Model.Id"
-                                   class="btn btn-primary btn-lg px-4">
-                                    <i class="fa-solid fa-cart-arrow-down me-2"></i>Add to Cart
-                                </a>
-                            }
 
                             @if (User.IsInRole("Reader"))
                             {
+                                @if (CartService.IsBookInCart(Model.Id))
+                                {
+                                    <a asp-controller="Cart"
+                                       asp-action="Index"
+                                       class="btn btn-outline-primary btn-lg px-4">
+                                        <i class="fa-solid fa-circle-check me-2"></i>In Cart
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Cart"
+                                       asp-action="AddToCart"
+                                       asp-route-id="@Model.Id"
+                                       class="btn btn-primary btn-lg px-4">
+                                        <i class="fa-solid fa-cart-arrow-down me-2"></i>Add to Cart
+                                    </a>
+                                }
                                 <form asp-controller="Cart" asp-action="PurchaseSingle" method="post">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="bookId" value="@Model.Id" />

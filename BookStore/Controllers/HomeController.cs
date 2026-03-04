@@ -1,6 +1,7 @@
 using BookStore.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookStore.Controllers
 {
@@ -15,7 +16,22 @@ namespace BookStore.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
+
+            if (User.IsInRole("Publisher"))
+            {
+                return RedirectToAction("Index", "Books");
+            }
+
+            if (User.IsInRole("Reader") || User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Index", "Store");
+            }
+
+            return RedirectToAction("Index", "Store");
         }
 
         public IActionResult Privacy()

@@ -26,7 +26,9 @@ namespace BookStore.Models
                         DatePublished = DateTime.Parse("2013-9-26"),
                         Price = 139,
                         Author = "Astrid Lindgren",
-                        ImageUrl = "/images/lejonhjärta.jpg"
+                        ImageUrl = "/images/lejonhjärta.jpg",
+                        PdfUrl = "/pdf/Bröderna.Lejonhjärta.pdf",
+                        Status = BookStatus.Allowed
                     },
 
                     new Book
@@ -37,7 +39,9 @@ namespace BookStore.Models
                         DatePublished = DateTime.Parse("1991-7-4"),
                         Price = 100,
                         Author = "J. R. R. Tolkien",
-                        ImageUrl = "/images/lotr.jpg"
+                        ImageUrl = "/images/lotr.jpg",
+                        PdfUrl = "/pdf/lotr.pdf",
+                        Status = BookStatus.Allowed
                     },
 
                     new Book
@@ -48,7 +52,9 @@ namespace BookStore.Models
                         DatePublished = DateTime.Parse("2011-6-1"),
                         Price = 91,
                         Author = "Dennis Lehane",
-                        ImageUrl = "/images/mystic-river.jpg"
+                        ImageUrl = "/images/mystic-river.jpg",
+                        PdfUrl = "/pdf/MysticRiver.pdf",
+                        Status = BookStatus.Allowed
                     },
 
                     new Book
@@ -59,7 +65,9 @@ namespace BookStore.Models
                         DatePublished = DateTime.Parse("1994-1-2"),
                         Price = 166,
                         Author = "John Steinbeck",
-                        ImageUrl = "/images/of-mice-and-men.jpg"
+                        ImageUrl = "/images/of-mice-and-men.jpg",
+                        PdfUrl = "/pdf/Of-Mice-And-Men.pdf",
+                        Status = BookStatus.Allowed
                     },
 
                     new Book
@@ -70,7 +78,9 @@ namespace BookStore.Models
                         DatePublished = DateTime.Parse("1994-8-18"),
                         Price = 84,
                         Author = "Ernest Hemingway",
-                        ImageUrl = "/images/old-man-and-the-sea.jpg"
+                        ImageUrl = "/images/old-man-and-the-sea.jpg",
+                        PdfUrl = "/pdf/Old-Man-And-The-Sea.pdf",
+                        Status = BookStatus.Allowed
                     },
 
                     new Book
@@ -81,7 +91,9 @@ namespace BookStore.Models
                         DatePublished = DateTime.Parse("2007-5-1"),
                         Price = 95,
                         Author = "Cormac McCarthy",
-                        ImageUrl = "/images/the-road.jpg"
+                        ImageUrl = "/images/the-road.jpg",
+                        PdfUrl = "/pdf/the-road.pdf",
+                        Status = BookStatus.Allowed
                     }
                 );
 

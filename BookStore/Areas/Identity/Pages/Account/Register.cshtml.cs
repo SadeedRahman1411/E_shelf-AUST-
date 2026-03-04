@@ -79,11 +79,13 @@ namespace BookStore.Areas.Identity.Pages.Account
             [Required]
             [DataType(DataType.Text)]
             [Display(Name = "First Name")]
+            [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "First Name can contain only alphabets.")]
             public string FirstName { get; set; }
 
             [Required]
             [DataType(DataType.Text)]
             [Display(Name = "Last Name")]
+            [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Last Name can contain only alphabets.")]
             public string LastName { get; set; }
 
             [Required]

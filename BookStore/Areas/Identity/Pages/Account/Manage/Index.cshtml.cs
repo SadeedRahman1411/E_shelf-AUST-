@@ -2,14 +2,17 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using BookStore.Models;
+using BookStore.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using BookStore.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace BookStore.Areas.Identity.Pages.Account.Manage
 {
@@ -17,13 +20,16 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<DefaultUser> _userManager;
         private readonly SignInManager<DefaultUser> _signInManager;
+        private readonly GoogleDriveService _driveService;
 
         public IndexModel(
             UserManager<DefaultUser> userManager,
-            SignInManager<DefaultUser> signInManager)
+            SignInManager<DefaultUser> signInManager,
+            GoogleDriveService driveService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _driveService = driveService;
         }
 
         /// <summary>
@@ -46,6 +52,8 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
         [BindProperty]
         public InputModel Input { get; set; }
 
+
+        public string ProfileImageUrl { get; set; }
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
@@ -57,19 +65,29 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
+            [Display(Name = "Username")]
+            public string Username { get; set; }
+
+            [Required]
             [DataType(DataType.Text)]
             [Display(Name = "First Name")]
+            [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "First name must contain only alphabets.")]
             public string FirstName { get; set; }
 
             [Required]
             [DataType(DataType.Text)]
             [Display(Name = "Last Name")]
+            [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Last name must contain only alphabets.")]
             public string LastName { get; set; }
 
 
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            public decimal Wallet { get; set; }
+
+            public IFormFile ProfileImageFile { get; set; }
         }
 
         private async Task LoadAsync(DefaultUser user)
@@ -78,12 +96,15 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
+            ProfileImageUrl = user.ProfileImageUrl;
 
             Input = new InputModel
             {
+                Username = userName,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                Wallet = user.Wallet
             };
         }
 
@@ -145,10 +166,40 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
                 }
             }
 
+            if (Input.ProfileImageFile != null && Input.ProfileImageFile.Length > 0)
+            {
+                string extension = Path.GetExtension(Input.ProfileImageFile.FileName);
+                string fileName = $"{Guid.NewGuid()}{extension}";
+
+                using var stream = Input.ProfileImageFile.OpenReadStream();
+
+                string imageUrl = await _driveService.UploadFileAsync(
+                    stream,
+                    fileName,
+                    Input.ProfileImageFile.ContentType);
+
+                user.ProfileImageUrl = imageUrl;
+            }
+
+            var username = await _userManager.GetUserNameAsync(user);
+
+            if (Input.Username != username)
+            {
+                var setUsernameResult = await _userManager.SetUserNameAsync(user, Input.Username);
+
+                if (!setUsernameResult.Succeeded)
+                {
+                    StatusMessage = "Unexpected error when trying to set username.";
+                    return RedirectToPage();
+                }
+            }
+
             await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
         }
+
+
     }
 }

@@ -7,9 +7,32 @@
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-    </li>
+        var user = await UserManager.GetUserAsync(User);
+        var imageUrl = user?.ProfileImageUrl;
+
+        <li class="nav-item">
+            <a id="manage"
+               class="nav-link text-dark"
+               asp-area="Identity"
+               asp-page="/Account/Manage/Index"
+               title="Manage">
+
+                @if (!string.IsNullOrEmpty(imageUrl))
+                {
+                    <img src="@imageUrl"
+                         style="width:32px;height:32px;border-radius:50%;object-fit:cover;"
+                         referrerpolicy="no-referrer" />
+                }
+                else
+                {
+                    <div style="width:32px;height:32px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;">
+                        <i class="fa-solid fa-user text-secondary"></i>
+                    </div>
+                }
+
+            </a>
+        </li>
+
     <li class="nav-item">
         <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
             <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>

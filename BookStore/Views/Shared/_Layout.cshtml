@@ -13,7 +13,14 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Store" asp-action="Index">E-Shelf</a>
+                @if (User.IsInRole("Publisher"))
+                {
+                    <a class="navbar-brand" asp-area="" asp-controller="Books" asp-action="Index">E-Shelf</a>
+                }
+                else
+                {
+                    <a class="navbar-brand" asp-area="" asp-controller="Store" asp-action="Index">E-Shelf</a>
+                }
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -23,11 +30,9 @@
                        @* <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Index">Home</a>
                         </li>*@
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Books" asp-action="Index">Backhand</a>
-                        </li
+                       
 
-                        <!-- 🔥 ADDED: Reader Purchased Books -->
+                        <!-- Reader Purchased Books -->
                         @if (User.IsInRole("Reader"))
                         {
                             <li class="nav-item">
@@ -39,19 +44,7 @@
                             </li>
                         }
 
-                        <!-- 🔥 ADDED: Publisher Wallet -->
-                        @if (User.IsInRole("Publisher"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                   asp-controller="Publisher"
-                                   asp-action="Wallet">
-                                    Wallet
-                                </a>
-                            </li>
-                        }
-
-                        <!-- 🔥 ADDED: Admin Dashboard -->
+                        <!-- Admin Dashboard -->
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">

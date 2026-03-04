@@ -1,35 +1,85 @@
 ﻿@page
 @model IndexModel
+
 @{
     ViewData["Title"] = "Profile";
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
 <h3>@ViewData["Title"]</h3>
+
 <partial name="_StatusMessage" for="StatusMessage" />
+
 <div class="row">
+
+    <div class="col-md-4 text-center">
+
+        @if (!string.IsNullOrEmpty(Model.ProfileImageUrl))
+        {
+            <img src="@Model.ProfileImageUrl"
+                 class="img-thumbnail mb-3"
+                 style="width:200px;height:200px;object-fit:cover;"
+                 referrerpolicy="no-referrer" />
+        }
+        else
+        {
+            <div class="border rounded p-5 mb-3 bg-light">
+                <i class="fa-solid fa-user fa-3x text-muted"></i>
+                <p class="text-muted mt-2">No Profile Image</p>
+            </div>
+        }
+
+    </div>
+
     <div class="col-md-6">
-        <form id="profile-form" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+        <form id="profile-form" method="post" enctype="multipart/form-data">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-floating mb-3">
-                <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
-                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Input.Username" class="form-control" />
+                <label asp-for="Input.Username"></label>
+                <span asp-validation-for="Input.Username" class="text-danger"></span>
             </div>
+
             <div class="form-floating mb-3">
-                <input asp-for="Input.FirstName" class="form-control" placeholder="Please enter your First Name." disabled />
-                <label asp-for="Input.FirstName" class="form-label"></label>
+                <input asp-for="Input.FirstName" class="form-control" />
+                <label asp-for="Input.FirstName"></label>
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
             </div>
+
             <div class="form-floating mb-3">
-                <input asp-for="Input.LastName" class="form-control" placeholder="Please enter your Last Name." disabled />
-                <label asp-for="Input.LastName" class="form-label"></label>
+                <input asp-for="Input.LastName" class="form-control" />
+                <label asp-for="Input.LastName"></label>
+                <span asp-validation-for="Input.LastName" class="text-danger"></span>
             </div>
+
             <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
-                <label asp-for="Input.PhoneNumber" class="form-label"></label>
+                <input asp-for="Input.PhoneNumber" class="form-control" />
+                <label asp-for="Input.PhoneNumber"></label>
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
-            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+
+            @if (User.IsInRole("Publisher"))
+            {
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Wallet" class="form-control" disabled />
+                    <label asp-for="Input.Wallet">Publisher Wallet</label>
+                </div>
+            }
+
+            <div class="mb-3">
+                <label class="form-label">Profile Image</label>
+                <input type="file" asp-for="Input.ProfileImageFile" class="form-control" />
+            </div>
+
+            <button type="submit" class="w-100 btn btn-lg btn-primary">
+                Save
+            </button>
+
         </form>
+
     </div>
 </div>
 

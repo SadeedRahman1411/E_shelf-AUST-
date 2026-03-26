@@ -9,8 +9,9 @@ namespace BookStore.Models
 
         public string UserId { get; set; }
 
+        // ✅ ONE genre per row (supports multiple preferences)
         [Required]
-        public string FavoriteGenre { get; set; }
+        public string Genre { get; set; }
 
         [ForeignKey("UserId")]
         public DefaultUser? User { get; set; }

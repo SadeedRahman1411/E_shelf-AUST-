@@ -1,6 +1,8 @@
-﻿<h2>Select Your Favorite Genre</h2>
+﻿@model List<BookStore.Models.UserPreference>
 
-<form method="post">
+<h2>Select Your Favorite Genre</h2>
+
+<form method="post" asp-action="SetPreference" asp-controller="Preference">
     <select name="genre" class="form-control">
         <option>Fantasy</option>
         <option>Romance</option>
@@ -15,3 +17,47 @@
         Save Preference
     </button>
 </form>
+
+<hr />
+
+<h4>Your Preferences</h4>
+
+@if (Model != null && Model.Any())
+{
+    <div>
+        @foreach (var pref in Model)
+        {
+            <form asp-action="RemovePreference" asp-controller="Preference" method="post" style="display:inline;">
+                
+                <input type="hidden" name="id" value="@pref.Id" />
+
+                <span style="
+                    display:inline-flex;
+                    align-items:center;
+                    padding:8px 12px;
+                    margin:5px;
+                    background:#007bff;
+                    color:white;
+                    border-radius:20px;">
+                    
+                    @pref.Genre
+
+                    <button type="submit" style="
+                        border:none;
+                        background:none;
+                        color:white;
+                        font-weight:bold;
+                        margin-left:10px;
+                        cursor:pointer;">
+                        ×
+                    </button>
+                </span>
+
+            </form>
+        }
+    </div>
+}
+else
+{
+    <p>No preferences added yet</p>
+}

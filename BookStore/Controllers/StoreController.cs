@@ -28,7 +28,6 @@ namespace BookStore.Controllers
             var query = _context.Books
                 .Where(b => b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported);
 
-            // 🔍 SEARCH BY BOOK TITLE
             if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(b => b.Title.Contains(searchString));
@@ -42,7 +41,6 @@ namespace BookStore.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            // ✅ PURCHASE LOGIC
             if (User.IsInRole("Reader"))
             {
                 var userId = _userManager.GetUserId(User);
@@ -51,20 +49,35 @@ namespace BookStore.Controllers
                     .Include(u => u.PurchasedBooks)
                     .FirstOrDefaultAsync(u => u.Id == userId);
 
-                ViewBag.PurchasedBookIds = user?.PurchasedBooks
+                var purchasedIds = user?.PurchasedBooks
                     .Select(b => b.Id)
                     .ToList() ?? new List<int>();
 
-                // 🔥 AI RECOMMENDATION LOGIC
-                var preference = await _context.UserPreferences
-                    .FirstOrDefaultAsync(u => u.UserId == userId);
+                ViewBag.PurchasedBookIds = purchasedIds;
 
-                if (preference != null)
+                // 🔥 GET USER GENRES
+                var userGenres = await _context.UserPreferences
+                    .Where(u => u.UserId == userId)
+                    .Select(u => u.Genre)
+                    .ToListAsync();
+
+                if (userGenres.Any())
                 {
-                    var recommendedBooks = await _context.Books
-                        .Where(b => b.Genre == preference.FavoriteGenre &&
-                                   (b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported))
+                    // ✅ NORMALIZE OUTSIDE QUERY (IMPORTANT FIX)
+                    var normalizedGenres = userGenres
+                        .Select(g => g.Trim().ToLower())
+                        .ToList();
+
+                    var allBooks = await _context.Books
+                        .Where(b => (b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported))
                         .ToListAsync();
+
+                    // ✅ FILTER IN MEMORY (100% RELIABLE)
+                    var recommendedBooks = allBooks
+                        .Where(b =>
+                            normalizedGenres.Contains(b.Genre.Trim().ToLower()) &&
+                            !purchasedIds.Contains(b.Id))
+                        .ToList();
 
                     ViewBag.RecommendedBooks = recommendedBooks;
                 }
@@ -94,7 +107,6 @@ namespace BookStore.Controllers
             if (book == null)
                 return NotFound();
 
-            // EXISTING PURCHASE LOGIC 
             var purchasedIds = new List<int>();
 
             if (User.IsInRole("Reader"))
@@ -112,7 +124,6 @@ namespace BookStore.Controllers
 
             ViewBag.PurchasedBookIds = purchasedIds;
 
-            // LOAD REVIEWS
             var reviews = await _context.Reviews
                 .Include(r => r.User)
                 .Where(r => r.BookId == id)
@@ -121,7 +132,6 @@ namespace BookStore.Controllers
 
             ViewBag.Reviews = reviews;
 
-            //CHECK IF USER ALREADY REVIEWED
             if (User.Identity.IsAuthenticated)
             {
                 var userId = _userManager.GetUserId(User);

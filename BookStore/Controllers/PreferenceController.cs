@@ -18,36 +18,54 @@ namespace BookStore.Controllers
         // SHOW PAGE
         public IActionResult SetPreference()
         {
-            return View();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var preferences = _context.UserPreferences
+                .Where(u => u.UserId == userId)
+                .ToList();
+
+            return View(preferences);
         }
 
-        // SAVE DATA
+        // SAVE
         [HttpPost]
         public IActionResult SetPreference(string genre)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var existing = _context.UserPreferences
-                .FirstOrDefault(u => u.UserId == userId);
+            var exists = _context.UserPreferences
+                .Any(u => u.UserId == userId && u.Genre == genre);
 
-            if (existing != null)
+            if (!exists)
             {
-                existing.FavoriteGenre = genre;
-            }
-            else
-            {
-                var pref = new UserPreference
+                _context.UserPreferences.Add(new UserPreference
                 {
                     UserId = userId,
-                    FavoriteGenre = genre
-                };
+                    Genre = genre
+                });
 
-                _context.UserPreferences.Add(pref);
+                _context.SaveChanges();
             }
 
-            _context.SaveChanges();
+            return RedirectToAction("SetPreference");
+        }
 
-            return RedirectToAction("Index", "Home");
+        // 🔥 REMOVE (MAIN FIX)
+        [HttpPost]
+        public IActionResult RemovePreference(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var pref = _context.UserPreferences
+                .FirstOrDefault(p => p.Id == id && p.UserId == userId);
+
+            if (pref != null)
+            {
+                _context.UserPreferences.Remove(pref);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("SetPreference");
         }
     }
 }

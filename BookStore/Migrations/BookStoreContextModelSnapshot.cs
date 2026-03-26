@@ -77,6 +77,12 @@ namespace BookStore.Migrations
                     b.Property<string>("PublisherId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ReportMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportedByUserId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 

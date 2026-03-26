@@ -12,7 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStore.Migrations
 {
     [DbContext(typeof(BookStoreContext))]
+<<<<<<<< HEAD:BookStore/Migrations/20260326182329_init.Designer.cs
     [Migration("20260326182329_init")]
+========
+    [Migration("20260326185114_init")]
+>>>>>>>> fd6a48f47f668dac7878cca7e7ae546bdc590a48:BookStore/Migrations/20260326185114_init.Designer.cs
     partial class init
     {
         /// <inheritdoc />
@@ -79,6 +83,12 @@ namespace BookStore.Migrations
 
                     b.Property<string>("PublisherId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ReportMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportedByUserId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

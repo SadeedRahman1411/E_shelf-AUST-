@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
@@ -167,7 +168,7 @@ namespace BookStore.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Reader")]
-        public async Task<IActionResult> ReportBook(int id)
+        public async Task<IActionResult> ReportBook(int id,string reportMessage)
         {
             var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
 
@@ -177,6 +178,8 @@ namespace BookStore.Controllers
             if (book.Status == BookStatus.Allowed)
             {
                 book.Status = BookStatus.Reported;
+                book.ReportMessage = reportMessage;
+                book.ReportedByUserId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
                 await _context.SaveChangesAsync();
             }
 

@@ -96,13 +96,12 @@
 
                             @if (User.IsInRole("Reader") && Model.Status == BookStore.Models.BookStatus.Allowed)
                             {
-                                <form asp-controller="Store" asp-action="ReportBook" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@Model.Id" />
-                                    <button type="submit" class="btn btn-warning btn-lg px-4">
-                                        <i class="fa-solid fa-flag me-2"></i>Report Book
-                                    </button>
-                                </form>
+                                
+                                <button type="button"
+                                        class="btn btn-warning btn-lg px-4"
+                                        onclick="openReportModal()">
+                                    <i class="fa-solid fa-flag me-2"></i>Report Book
+                                </button>
                             }
                         }
 
@@ -224,3 +223,63 @@ else
         </button>
     </form>
 }
+<!-- REPORT MODAL -->
+<div id="reportModal" class="report-modal">
+    <div class="report-box">
+
+        <h5>Report Book</h5>
+
+        <form asp-controller="Store" asp-action="ReportBook" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="id" value="@Model.Id" />
+
+            <textarea name="reportMessage"
+                      class="form-control mb-2"
+                      placeholder="Explain your reason..."
+                      required></textarea>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" onclick="closeReportModal()">Cancel</button>
+                <button type="submit" class="btn btn-danger">Report</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<style>
+    .report-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4); /* dark overlay */
+
+        z-index: 9999;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+        padding: 20px;
+    }
+
+    .report-box {
+        width: 350px;
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+</style>
+
+<script>
+    function openReportModal() {
+        document.getElementById("reportModal").style.display = "block";
+    }
+
+    function closeReportModal() {
+        document.getElementById("reportModal").style.display = "none";
+    }
+</script>

@@ -177,7 +177,9 @@ namespace BookStore.Migrations
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PdfUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    PublisherId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    PublisherId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ReportMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReportedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

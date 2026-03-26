@@ -96,3 +96,11 @@
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id"><i class="fa-solid fa-pen-to-square"></i>Edit</a> |
 </div>
+@if (ViewBag.BookStatus == BookStore.Models.BookStatus.Report_Ack
+    && ViewBag.ReportMessage != null)
+{
+    <div class="alert alert-danger mt-3">
+        <strong>Report Reason:</strong>
+        <p>@ViewBag.ReportMessage</p>
+    </div>
+}

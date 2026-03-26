@@ -1,0 +1,32 @@
+﻿@model BookStore.Models.BookNews
+
+<h1>Post Book News</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label>Book Title</label>
+                <input asp-for="Title" class="form-control" />
+            </div>
+
+            <div class="form-group mt-2">
+                <label>Description</label>
+                <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+            </div>
+
+            <div class="form-group mt-2">
+                <label>Book Image</label>
+                <input type="file" name="imageFile" class="form-control" />
+            </div>
+
+            <br />
+
+            <button type="submit" class="btn btn-success">
+                Post News
+            </button>
+        </form>
+    </div>
+</div>

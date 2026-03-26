@@ -1,0 +1,28 @@
+﻿@model List<BookStore.Models.BookNews>
+
+<h2>📢 Book News</h2>
+<hr />
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+
+                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                {
+                    <img src="@item.ImageUrl" class="card-img-top" style="height:200px; object-fit:cover;" />
+                }
+
+                <div class="card-body">
+                    <h5>@item.Title</h5>
+                    <p>@item.Description</p>
+
+                    <small class="text-muted">
+                        Posted on @item.CreatedAt.ToShortDateString()
+                    </small>
+                </div>
+            </div>
+        </div>
+    }
+</div>

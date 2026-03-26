@@ -53,6 +53,21 @@
                             </a>
                         </li>
 
+                        @if (User.IsInRole("Publisher"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="BookNews" asp-action="Index">
+                                    📢 Book News
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="BookNews" asp-action="Create">
+                                    ➕ Post News
+                                </a>
+                            </li>
+                        }
+
                         <!-- Admin Dashboard -->
                         @if (User.IsInRole("Admin"))
                         {

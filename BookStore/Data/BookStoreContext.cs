@@ -40,6 +40,8 @@ namespace BookStore.Data
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Review> Reviews { get; set; }
 
+        public DbSet<BookNews> BookNews { get; set; }
+
         // ✅ NEW TABLE FOR AI
         public DbSet<UserPreference> UserPreferences { get; set; }
     }

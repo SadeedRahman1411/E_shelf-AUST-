@@ -53,6 +53,9 @@ namespace BookStore.Controllers
             if (book == null)
                 return NotFound();
 
+            ViewBag.ReportMessage = book.ReportMessage;
+            ViewBag.BookStatus = book.Status;
+
             return View(book);
         }
 

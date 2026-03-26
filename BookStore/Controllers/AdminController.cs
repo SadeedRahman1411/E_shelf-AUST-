@@ -54,6 +54,9 @@ namespace BookStore.Controllers
             if (book != null)
             {
                 book.Status = BookStatus.Allowed;
+                book.ReportMessage = null;
+                book.ReportedByUserId = null;
+
                 await _context.SaveChangesAsync();
             }
 

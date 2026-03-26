@@ -46,5 +46,11 @@ namespace BookStore.Models
 
         [ForeignKey("PublisherId")]
         public DefaultUser? Publisher { get; set; }
+
+        public string? ReportMessage { get; set; }
+
+        public string? ReportedByUserId { get; set; }
+
+        
     }
 }

@@ -139,3 +139,88 @@
         </div>
     </div>
 </div>
+@{
+    var reviews = ViewBag.Reviews as List<BookStore.Models.Review>;
+    var userReview = ViewBag.UserReview as BookStore.Models.Review;
+}
+
+<hr />
+<h3>Reviews</h3>
+
+@if (reviews != null && reviews.Any())
+{
+    foreach (var r in reviews)
+    {
+        <div class="border p-3 mb-3 rounded">
+            <strong>@(r.User?.FirstName ?? "User")</strong>
+            <span class="text-warning">⭐ @r.Rating</span>
+
+            <p class="mb-1">@r.Comment</p>
+            <small class="text-muted">@r.CreatedAt.ToString("g")</small>
+
+            @if (User.Identity.IsAuthenticated &&
+                             (r.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                             || User.IsInRole("Admin")))
+            {
+                <div class="mt-2 d-flex gap-2">
+
+                    <!-- DELETE -->
+                    <form asp-controller="Review" asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@r.Id" />
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+
+                    <!-- EDIT (prefills form below automatically) -->
+                </div>
+            }
+        </div>
+    }
+}
+else
+{
+    <p class="text-muted">No reviews yet.</p>
+}
+
+@if (isOwned)
+{
+    <hr />
+    <h3>@(userReview == null ? "Add Review" : "Edit Your Review")</h3>
+
+    <form asp-controller="Review"
+          asp-action="@(userReview == null ? "Add" : "Edit")"
+          method="post"
+          class="mt-3">
+
+        @Html.AntiForgeryToken()
+
+        @if (userReview != null)
+        {
+            <input type="hidden" name="id" value="@userReview.Id" />
+        }
+
+        <input type="hidden" name="bookId" value="@Model.Id" />
+
+        <div class="mb-2">
+            <label class="form-label">Rating</label>
+            <select name="rating" class="form-select w-25">
+                <option value="1" selected="@(userReview?.Rating == 1)">1</option>
+                <option value="2" selected="@(userReview?.Rating == 2)">2</option>
+                <option value="3" selected="@(userReview?.Rating == 3)">3</option>
+                <option value="4" selected="@(userReview?.Rating == 4)">4</option>
+                <option value="5" selected="@(userReview?.Rating == 5)">5</option>
+            </select>
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Comment</label>
+            <textarea name="comment" class="form-control" rows="3">
+@userReview?.Comment
+</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            @(userReview == null ? "Submit Review" : "Update Review")
+        </button>
+    </form>
+}

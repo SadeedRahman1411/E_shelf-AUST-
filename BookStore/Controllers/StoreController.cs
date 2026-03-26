@@ -90,6 +90,56 @@ namespace BookStore.Controllers
 
             return View(books);
         }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var book = await _context.Books
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book == null)
+                return NotFound();
+
+            // EXISTING PURCHASE LOGIC 
+            var purchasedIds = new List<int>();
+
+            if (User.IsInRole("Reader"))
+            {
+                var userId = _userManager.GetUserId(User);
+
+                var user = await _context.Users
+                    .Include(u => u.PurchasedBooks)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                purchasedIds = user?.PurchasedBooks
+                    .Select(b => b.Id)
+                    .ToList() ?? new List<int>();
+            }
+
+            ViewBag.PurchasedBookIds = purchasedIds;
+
+            // LOAD REVIEWS
+            var reviews = await _context.Reviews
+                .Include(r => r.User)
+                .Where(r => r.BookId == id)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
+            ViewBag.Reviews = reviews;
+
+            //CHECK IF USER ALREADY REVIEWED
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = _userManager.GetUserId(User);
+
+                var existingReview = await _context.Reviews
+                    .FirstOrDefaultAsync(r => r.BookId == id && r.UserId == userId);
+
+                ViewBag.UserReview = existingReview;
+            }
+
+            return View(book);
+        }
+        /*
         public async Task<IActionResult> Details(int id)
         {
             var book = await _context.Books
@@ -113,7 +163,7 @@ namespace BookStore.Controllers
 
             return View(book);
         }
-
+        */
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Reader")]

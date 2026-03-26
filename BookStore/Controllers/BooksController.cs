@@ -36,10 +36,12 @@ namespace BookStore.Controllers
             }
             else
             {
-                var userBooks = await _context.Books.Where(b => b.PublisherId == userId).ToListAsync();
+                var userBooks = await _context.Books
+                    .Where(b => b.PublisherId == userId)
+                    .ToListAsync();
+
                 return View(userBooks);
             }
-            //return View(await _context.Books.ToListAsync());
         }
 
         // GET: Books/Details/5
@@ -65,11 +67,11 @@ namespace BookStore.Controllers
             return View();
         }
 
-        // POST: Books/Create
+        // ✅ FIXED CREATE METHOD
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Id,Title,Description,Language,ISBN,DatePublished,Price,Author")] Book book,
+            [Bind("Id,Title,Description,Language,ISBN,DatePublished,Price,Author,Genre,Tags")] Book book,
             IFormFile imageFile, IFormFile pdfFile)
         {
             if (!ModelState.IsValid)
@@ -93,8 +95,10 @@ namespace BookStore.Controllers
 
             if (pdfFile != null && pdfFile.Length > 0)
             {
-                book.PdfUrl = await _driveService.UploadFileAsync(pdfFile.OpenReadStream(),
-                    $"{Guid.NewGuid()}.pdf", "application/pdf");
+                book.PdfUrl = await _driveService.UploadFileAsync(
+                    pdfFile.OpenReadStream(),
+                    $"{Guid.NewGuid()}.pdf",
+                    "application/pdf");
             }
 
             _context.Add(book);
@@ -117,14 +121,14 @@ namespace BookStore.Controllers
             return View(book);
         }
 
-        // POST: Books/Edit/5
+        // ✅ FIXED EDIT METHOD
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
-       int id,
-       [Bind("Id,Title,Description,Language,ISBN,DatePublished,Price,Author")] Book updatedBook,
-       IFormFile? imageFile,
-       IFormFile? pdfFile) // Added pdfFile parameter
+            int id,
+            [Bind("Id,Title,Description,Language,ISBN,DatePublished,Price,Author,Genre,Tags")] Book updatedBook,
+            IFormFile? imageFile,
+            IFormFile? pdfFile)
         {
             if (id != updatedBook.Id) return NotFound();
 
@@ -135,7 +139,7 @@ namespace BookStore.Controllers
 
             try
             {
-                // 1. Update text fields
+                // ✅ Update text fields
                 existingBook.Title = updatedBook.Title;
                 existingBook.Description = updatedBook.Description;
                 existingBook.Language = updatedBook.Language;
@@ -144,24 +148,28 @@ namespace BookStore.Controllers
                 existingBook.Price = updatedBook.Price;
                 existingBook.Author = updatedBook.Author;
 
-                // 2. ONLY update Image if a new one is uploaded
+                // 🔥 NEW (IMPORTANT)
+                existingBook.Genre = updatedBook.Genre;
+                existingBook.Tags = updatedBook.Tags;
+
+                // Image update
                 if (imageFile != null && imageFile.Length > 0)
                 {
                     string extension = Path.GetExtension(imageFile.FileName);
                     string fileName = $"{existingBook.Id}_{Guid.NewGuid()}{extension}";
+
                     using var stream = imageFile.OpenReadStream();
                     existingBook.ImageUrl = await _driveService.UploadFileAsync(stream, fileName, imageFile.ContentType);
                 }
-                // If imageFile is null, existingBook.ImageUrl remains what it was in the DB
 
-                // 3. ONLY update PDF if a new one is uploaded
+                // PDF update
                 if (pdfFile != null && pdfFile.Length > 0)
                 {
                     string fileName = $"{existingBook.Id}_{Guid.NewGuid()}.pdf";
+
                     using var stream = pdfFile.OpenReadStream();
                     existingBook.PdfUrl = await _driveService.UploadFileAsync(stream, fileName, "application/pdf");
                 }
-                // If pdfFile is null, existingBook.PdfUrl remains what it was in the DB
 
                 await _context.SaveChangesAsync();
             }
@@ -185,7 +193,7 @@ namespace BookStore.Controllers
             if (book == null)
                 return NotFound();
 
-            return View(book);//generates the front end pages folder
+            return View(book);
         }
 
         // POST: Books/Delete/5
@@ -220,6 +228,7 @@ namespace BookStore.Controllers
         public async Task<IActionResult> Approve(int id)
         {
             var book = await _context.Books.FindAsync(id);
+
             if (book != null)
             {
                 book.Status = BookStatus.Allowed;
@@ -235,6 +244,7 @@ namespace BookStore.Controllers
         public async Task<IActionResult> Reject(int id)
         {
             var book = await _context.Books.FindAsync(id);
+
             if (book != null)
             {
                 _context.Books.Remove(book);
@@ -243,6 +253,5 @@ namespace BookStore.Controllers
 
             return RedirectToAction(nameof(PublishRequests));
         }
-
     }
 }

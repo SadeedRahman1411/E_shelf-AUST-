@@ -8,8 +8,50 @@
 
 <h1 class="text-center my-4">Catalogue</h1>
 
-<!-- 🔎 SEARCH BAR -->
+<!-- 🔥 RECOMMENDED SECTION -->
+<div class="container mb-5">
+    <h3>🔥 Recommended For You</h3>
 
+    @if (ViewBag.RecommendedBooks != null && ViewBag.RecommendedBooks.Count > 0)
+    {
+        <div class="row">
+            @foreach (var book in ViewBag.RecommendedBooks)
+            {
+                <div class="col-md-3">
+                    <div class="card mb-3 shadow-sm">
+
+                        <a asp-action="Details" asp-route-id="@book.Id" class="text-decoration-none text-dark">
+                            @if (!string.IsNullOrEmpty(book.ImageUrl))
+                            {
+                                <img src="@book.ImageUrl" class="card-img-top"
+                                     style="height:200px; object-fit:cover;" />
+                            }
+                            else
+                            {
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height:200px;">
+                                    <i class="fa-solid fa-image fa-2x text-muted"></i>
+                                </div>
+                            }
+
+                            <div class="card-body text-center">
+                                <h6 class="text-truncate">@book.Title</h6>
+                                <p class="small text-muted">@book.Author</p>
+                                <p><strong>@book.Genre</strong></p>
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">No recommendations yet</p>
+    }
+</div>
+
+<!-- 🔎 SEARCH BAR -->
 <div class="container mb-4">
     <div class="row">
         <div class="col-md-6 offset-md-3">
@@ -20,17 +62,15 @@
                        class="form-control me-2"
                        placeholder="Search by book title..." />
 
-                
                 <button type="submit" class="btn btn-primary">
                     <i class="fa-solid fa-search"></i>
                 </button>
             </form>
         </div>
     </div>
-    
-
 </div>
 
+<!-- 📚 ALL BOOKS -->
 <div class="container">
     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
         @foreach (var item in Model)
@@ -38,7 +78,6 @@
             <div class="col">
                 <div class="card h-100 shadow-sm border-0 transition-hover position-relative">
 
-                    
                     <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
                         @if (!string.IsNullOrEmpty(item.ImageUrl))
                         {
@@ -62,14 +101,13 @@
                     <div class="card-footer bg-transparent border-0 pb-3">
                         <div class="d-grid gap-2">
 
-                            @* 🔥 IF READER AND ALREADY PURCHASED *@
                             @if (User.IsInRole("Reader") &&
-                                                    purchased != null &&
-                                                    purchased.Contains(item.Id))
+                                                            purchased != null &&
+                                                            purchased.Contains(item.Id))
                             {
                                 <a asp-controller="Reader"
-                                   asp-action="PurchasedBooks"
-                                   class="btn btn-secondary btn-sm">
+                                       asp-action="PurchasedBooks"
+                                       class="btn btn-secondary btn-sm">
                                     <i class="fa-solid fa-book me-2"></i>Go to My Books
                                 </a>
                             }
@@ -80,17 +118,17 @@
                                     @if (CartService.IsBookInCart(item.Id))
                                     {
                                         <a asp-controller="Cart"
-                                           asp-action="Index"
-                                           class="btn btn-outline-primary btn-sm">
+                                               asp-action="Index"
+                                               class="btn btn-outline-primary btn-sm">
                                             <i class="fa-solid fa-circle-check"></i> In Cart
                                         </a>
                                     }
                                     else
                                     {
                                         <a asp-controller="Cart"
-                                           asp-action="AddToCart"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-danger btn-sm">
+                                               asp-action="AddToCart"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-danger btn-sm">
                                             <i class="fa-solid fa-cart-arrow-down"></i> Add to Cart
                                         </a>
                                     }
@@ -112,8 +150,6 @@
             </div>
         }
     </div>
-    
-
 </div>
 
 <!-- 📄 PAGINATION -->
@@ -122,25 +158,20 @@
     <div class="d-flex justify-content-center mt-4">
         <nav>
             <ul class="pagination">
-
-                
                 @for (int i = 1; i <= ViewBag.TotalPages; i++)
                 {
                     <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
                         <a class="page-link"
-                           asp-action="Index"
-                           asp-route-page="@i"
-                           asp-route-searchString="@ViewBag.CurrentSearch">
+                               asp-action="Index"
+                               asp-route-page="@i"
+                               asp-route-searchString="@ViewBag.CurrentSearch">
                             @i
                         </a>
                     </li>
                 }
-
-        </ul>
-    </nav>
-</div>
-
-
+            </ul>
+        </nav>
+    </div>
 }
 
 <style>

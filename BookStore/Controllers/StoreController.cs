@@ -20,33 +20,7 @@ namespace BookStore.Controllers
             _context = context;
             _userManager = userManager;
         }
-        /*
-          public async Task<IActionResult> Index()
-          {
-              var books = await _context.Books
-                  .Where(b => b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported)
-                  .ToListAsync();
 
-              if (User.IsInRole("Reader"))
-              {
-                  var userId = _userManager.GetUserId(User);
-
-                  var user = await _context.Users
-                      .Include(u => u.PurchasedBooks)
-                      .FirstOrDefaultAsync(u => u.Id == userId);
-
-                  ViewBag.PurchasedBookIds = user?.PurchasedBooks
-                      .Select(b => b.Id)
-                      .ToList() ?? new List<int>();
-              }
-              else
-              {
-                  ViewBag.PurchasedBookIds = new List<int>();
-              }
-
-              return View(books);
-          }
-        */
         public async Task<IActionResult> Index(string searchString, int page = 1)
         {
             int pageSize = 5;
@@ -68,6 +42,7 @@ namespace BookStore.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
+            // ✅ PURCHASE LOGIC
             if (User.IsInRole("Reader"))
             {
                 var userId = _userManager.GetUserId(User);
@@ -79,10 +54,29 @@ namespace BookStore.Controllers
                 ViewBag.PurchasedBookIds = user?.PurchasedBooks
                     .Select(b => b.Id)
                     .ToList() ?? new List<int>();
+
+                // 🔥 AI RECOMMENDATION LOGIC
+                var preference = await _context.UserPreferences
+                    .FirstOrDefaultAsync(u => u.UserId == userId);
+
+                if (preference != null)
+                {
+                    var recommendedBooks = await _context.Books
+                        .Where(b => b.Genre == preference.FavoriteGenre &&
+                                   (b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported))
+                        .ToListAsync();
+
+                    ViewBag.RecommendedBooks = recommendedBooks;
+                }
+                else
+                {
+                    ViewBag.RecommendedBooks = new List<Book>();
+                }
             }
             else
             {
                 ViewBag.PurchasedBookIds = new List<int>();
+                ViewBag.RecommendedBooks = new List<Book>();
             }
 
             ViewBag.CurrentSearch = searchString;
@@ -140,35 +134,11 @@ namespace BookStore.Controllers
 
             return View(book);
         }
-        /*
-        public async Task<IActionResult> Details(int id)
-        {
-            var book = await _context.Books
-                .FirstOrDefaultAsync(b => b.Id == id);
 
-            if (book == null)
-                return NotFound();
-
-            if (User.IsInRole("Reader"))
-            {
-                var userId = _userManager.GetUserId(User);
-
-                var user = await _context.Users
-                    .Include(u => u.PurchasedBooks)
-                    .FirstOrDefaultAsync(u => u.Id == userId);
-
-                ViewBag.PurchasedBookIds = user?.PurchasedBooks
-                    .Select(b => b.Id)
-                    .ToList() ?? new List<int>();
-            }
-
-            return View(book);
-        }
-        */
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Reader")]
-        public async Task<IActionResult> ReportBook(int id,string reportMessage)
+        public async Task<IActionResult> ReportBook(int id, string reportMessage)
         {
             var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
 
@@ -179,7 +149,7 @@ namespace BookStore.Controllers
             {
                 book.Status = BookStatus.Reported;
                 book.ReportMessage = reportMessage;
-                book.ReportedByUserId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+                book.ReportedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 await _context.SaveChangesAsync();
             }
 

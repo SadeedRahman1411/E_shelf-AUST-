@@ -12,24 +12,32 @@ namespace BookStore.Models
 
         [MaxLength(100)]
         public string? Description { get; set; }
+
         public string Language { get; set; }
 
-        [Required,
-        MaxLength(13)]
+        [Required]
+        [MaxLength(13)]
         public string ISBN { get; set; }
 
-        [Required,
-        DataType(DataType.Date),
-        Display(Name = "Date Published")]
+        [Required]
+        [DataType(DataType.Date)]
+        [Display(Name = "Date Published")]
         public DateTime DatePublished { get; set; }
 
         [Required]
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18,2)")]
-        public decimal Price { get; set; } 
+        public decimal Price { get; set; }
 
         [Required]
-        public string Author { get; set; }
+        public string? Author { get; set; }
+
+        // ✅ NEW FIELD (AI Recommendation base)
+        [Required]
+        public string? Genre { get; set; }
+
+        // ✅ NEW FIELD (AI Recommendation base)
+        public string? Tags { get; set; } // e.g. "romance,drama,sad"
 
         // Many readers can purchase one book
         public List<DefaultUser> Purchasers { get; set; } = new List<DefaultUser>();
@@ -50,7 +58,5 @@ namespace BookStore.Models
         public string? ReportMessage { get; set; }
 
         public string? ReportedByUserId { get; set; }
-
-        
     }
 }

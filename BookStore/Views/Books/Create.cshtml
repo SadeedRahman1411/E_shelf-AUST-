@@ -2,66 +2,96 @@
 @{
     ViewData["Title"] = "Create";
 }
+
 <div>
     <a asp-action="Index"><i class="fa-solid fa-backward"></i>Back to List</a>
 </div>
+
 <h1>Create</h1>
 <h4>Book</h4>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control" cols=50 rows=5></textarea>
+                <textarea asp-for="Description" class="form-control" cols="50" rows="5"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Language" class="control-label"></label>
                 <input asp-for="Language" class="form-control" />
                 <span asp-validation-for="Language" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="ISBN" class="control-label"></label>
                 <input asp-for="ISBN" class="form-control" />
                 <span asp-validation-for="ISBN" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="DatePublished" class="control-label"></label>
                 <input asp-for="DatePublished" class="form-control" />
                 <span asp-validation-for="DatePublished" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Author" class="control-label"></label>
                 <input asp-for="Author" class="form-control" />
                 <span asp-validation-for="Author" class="text-danger"></span>
             </div>
+
+            <!-- ✅ NEW FIELD: GENRE -->
+            <div class="form-group">
+                <label asp-for="Genre" class="control-label"></label>
+                <input asp-for="Genre" class="form-control" placeholder="e.g. Fantasy, Romance" />
+                <span asp-validation-for="Genre" class="text-danger"></span>
+            </div>
+
+            <!-- ✅ NEW FIELD: TAGS -->
+            <div class="form-group">
+                <label asp-for="Tags" class="control-label"></label>
+                <input asp-for="Tags" class="form-control" placeholder="e.g. magic,dragon,adventure" />
+                <span asp-validation-for="Tags" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <label asp-for="ImageUrl" class="control-label">Book Image</label>
                 <input type="file" name="imageFile" class="form-control" />
             </div>
+
             <div class="form-group">
                 <label class="control-label">Book PDF</label>
                 <input type="file" name="pdfFile" class="form-control" accept="application/pdf" />
             </div>
+
             <br />
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
+
         </form>
     </div>
 </div>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

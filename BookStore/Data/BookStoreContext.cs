@@ -10,7 +10,7 @@ namespace BookStore.Data
 {
     public class BookStoreContext : IdentityDbContext<DefaultUser>
     {
-        public BookStoreContext (DbContextOptions<BookStoreContext> options)
+        public BookStoreContext(DbContextOptions<BookStoreContext> options)
             : base(options)
         {
         }
@@ -34,14 +34,13 @@ namespace BookStore.Data
             modelBuilder.Entity<DefaultUser>()
             .Property(u => u.Wallet)
             .HasColumnType("decimal(18,2)");
-
-
         }
-
 
         public DbSet<Book> Books { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Review> Reviews { get; set; }
-    }
 
+        // ✅ NEW TABLE FOR AI
+        public DbSet<UserPreference> UserPreferences { get; set; }
+    }
 }

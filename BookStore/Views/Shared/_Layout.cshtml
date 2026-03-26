@@ -22,15 +22,17 @@
                     <a class="navbar-brand" asp-area="" asp-controller="Store" asp-action="Index">E-Shelf</a>
                 }
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 
-                    <!-- LEFT -->
                     <ul class="navbar-nav flex-grow-1">
 
+                        <!-- Reader Purchased Books -->
                         @if (User.IsInRole("Reader"))
                         {
                             <li class="nav-item">
@@ -42,6 +44,16 @@
                             </li>
                         }
 
+                        <!-- ✅ ABOUT US RIGHT AFTER MY BOOKS -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark"
+                                   asp-controller="About"
+                                   asp-action="Index">
+                                About Us
+                            </a>
+                        </li>
+
+                        <!-- Admin Dashboard -->
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
@@ -55,22 +67,12 @@
 
                     </ul>
 
-                    <!--RIGHT-->
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                                   asp-controller="About"
-                                   asp-action="Index">
-                                About Us
-                            </a>
-                        </li>
-                    </ul>
-
                     <partial name="_LoginPartial" />
 
                     @if (User.IsInRole("Reader"))
                     {
                         <a class="nav-link text-dark float-right"
+                               asp-area=""
                                asp-controller="Cart"
                                asp-action="Index">
                             <i class="fa-solid fa-cart-shopping"></i>
@@ -91,7 +93,7 @@
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2026 - BookStore -
-            <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
 

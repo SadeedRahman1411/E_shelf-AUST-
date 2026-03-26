@@ -21,57 +21,67 @@
                 {
                     <a class="navbar-brand" asp-area="" asp-controller="Store" asp-action="Index">E-Shelf</a>
                 }
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                       @* <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Index">Home</a>
-                        </li>*@
-                       
 
-                        <!-- Reader Purchased Books -->
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
+                    <!-- LEFT -->
+                    <ul class="navbar-nav flex-grow-1">
+
                         @if (User.IsInRole("Reader"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark"
-                                   asp-controller="Reader"
-                                   asp-action="PurchasedBooks">
+                                       asp-controller="Reader"
+                                       asp-action="PurchasedBooks">
                                     My Books
                                 </a>
                             </li>
                         }
 
-                        <!-- Admin Dashboard -->
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark"
-                                   asp-controller="Admin"
-                                   asp-action="Dashboard">
+                                       asp-controller="Admin"
+                                       asp-action="Dashboard">
                                     Admin Panel
                                 </a>
                             </li>
                         }
+
                     </ul>
-                    <partial name ="_LoginPartial" />
-                    
+
+                    <!--RIGHT-->
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark"
+                                   asp-controller="About"
+                                   asp-action="Index">
+                                About Us
+                            </a>
+                        </li>
+                    </ul>
+
+                    <partial name="_LoginPartial" />
 
                     @if (User.IsInRole("Reader"))
                     {
                         <a class="nav-link text-dark float-right"
-                           asp-area=""
-                           asp-controller="Cart"
-                           asp-action="Index">
+                               asp-controller="Cart"
+                               asp-action="Index">
                             <i class="fa-solid fa-cart-shopping"></i>
                         </a>
                     }
+
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -80,9 +90,11 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - BookStore - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - BookStore -
+            <a asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

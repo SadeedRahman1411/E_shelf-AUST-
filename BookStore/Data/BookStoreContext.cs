@@ -48,5 +48,7 @@ namespace BookStore.Data
 
         // ✅ NEW TABLE FOR AI
         public DbSet<UserPreference> UserPreferences { get; set; }
+
+        public DbSet<Notification> Notifications { get; set; }
     }
 }

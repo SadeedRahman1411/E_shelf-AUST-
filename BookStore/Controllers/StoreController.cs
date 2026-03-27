@@ -160,6 +160,25 @@ namespace BookStore.Controllers
                 book.Status = BookStatus.Reported;
                 book.ReportMessage = reportMessage;
                 book.ReportedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // 🔔 NOTIFY ADMINS
+                var adminRoleId = _context.Roles.First(r => r.Name == "Admin").Id;
+
+                var adminIds = _context.UserRoles
+                    .Where(ur => ur.RoleId == adminRoleId)
+                    .Select(ur => ur.UserId)
+                    .ToList();
+
+                foreach (var adminId in adminIds)
+                {
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = adminId,
+                        Message = $"Book '{book.Title}' was reported",
+                        Link = "/Admin/Reported"
+                    });
+                }
+
                 await _context.SaveChangesAsync();
             }
 

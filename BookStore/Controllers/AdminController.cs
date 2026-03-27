@@ -39,6 +39,26 @@ namespace BookStore.Controllers
             if (book != null)
             {
                 book.Status = BookStatus.Report_Ack;
+
+                var reporterId = book.ReportedByUserId;
+                var publisherId = book.PublisherId;
+
+                // reporter
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = reporterId,
+                    Message = $"Your report for '{book.Title}' was accepted",
+                    //Link = "/Store/Details/" + book.Id
+                });
+
+                // publisher
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = publisherId,
+                    Message = $"Your book '{book.Title}' was reported and accepted",
+                    Link = "/Books/Details/" + book.Id
+                });
+
                 await _context.SaveChangesAsync();
             }
 
@@ -54,6 +74,16 @@ namespace BookStore.Controllers
             if (book != null)
             {
                 book.Status = BookStatus.Allowed;
+
+                var reporterId = book.ReportedByUserId;
+
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = reporterId,
+                    Message = $"Your report for '{book.Title}' was rejected",
+                    Link = "/Store/Details/" + book.Id
+                });
+
                 book.ReportMessage = null;
                 book.ReportedByUserId = null;
 
@@ -81,6 +111,16 @@ namespace BookStore.Controllers
             if (book != null)
             {
                 book.Status = BookStatus.Allowed;
+
+                var publisherId = book.PublisherId;
+
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = publisherId,
+                    Message = $"Your book '{book.Title}' has been unbanned",
+                    Link = "/Books/Details/" + book.Id
+                });
+
                 await _context.SaveChangesAsync();
             }
 

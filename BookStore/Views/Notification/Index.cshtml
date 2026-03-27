@@ -1,0 +1,18 @@
+﻿@model List<BookStore.Models.Notification>
+
+<h2>Notifications</h2>
+
+@foreach (var n in Model)
+{
+    <div class="border p-2 mb-2">
+        @if (!string.IsNullOrEmpty(n.Link))
+        {
+            <a href="@n.Link">@n.Message</a>
+        }
+        else
+        {
+            <span>@n.Message</span>
+        }
+        <small class="text-muted">@n.CreatedAt</small>
+    </div>
+}

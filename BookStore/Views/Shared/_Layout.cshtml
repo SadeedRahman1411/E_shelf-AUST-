@@ -90,6 +90,10 @@
 
                         <partial name="_LoginPartial" />
 
+                        <a class="nav-link" asp-controller="Notification" asp-action="Index">
+                            <i class="fa-solid fa-bell"></i>
+                        </a>
+
                         @if (User.IsInRole("Reader"))
                         {
                             <a class="nav-link cart-icon"

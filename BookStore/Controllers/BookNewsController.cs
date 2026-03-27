@@ -36,6 +36,13 @@ namespace BookStore.Controllers
                 .GroupBy(r => r.BookNewsId)
                 .ToDictionary(g => g.Key, g => g.Count());
 
+            // 🔥 👉 Comment er kaj
+            ViewBag.Comments = _context.Comments
+                .Include(c => c.User)
+                .OrderBy(c => c.CreatedAt)
+                .ToList();
+
+
             // 👍 Users who liked (SAFE NULL HANDLING)
             ViewBag.LikedUsers = _context.Reactions
                 .Include(r => r.User)
@@ -146,6 +153,30 @@ namespace BookStore.Controllers
             var dislikeCount = _context.Reactions.Count(r => r.BookNewsId == newsId && !r.IsLike);
 
             return Json(new { likeCount, dislikeCount });
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddComment(int newsId, string content, int? parentCommentId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(content))
+                return RedirectToAction("Index");
+
+            var comment = new Comment
+            {
+                BookNewsId = newsId,
+                UserId = userId!,
+                Content = content,
+                ParentCommentId = parentCommentId,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
     }
 }

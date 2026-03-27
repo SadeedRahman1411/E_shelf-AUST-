@@ -44,6 +44,8 @@ namespace BookStore.Data
 
         public DbSet<Reaction> Reactions { get; set; }
 
+        public DbSet<Comment> Comments { get; set; }
+
         // ✅ NEW TABLE FOR AI
         public DbSet<UserPreference> UserPreferences { get; set; }
     }

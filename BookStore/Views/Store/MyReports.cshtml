@@ -1,0 +1,27 @@
+﻿@model List<BookStore.Models.Book>
+
+<h2>My Reports</h2>
+
+@foreach (var book in Model)
+{
+    <div class="card p-3 mb-3">
+        <h5>@book.Title</h5>
+
+        <button class="btn btn-sm btn-warning"
+                onclick="toggleReport(@book.Id)">
+            Show Report
+        </button>
+
+        <div id="report-@book.Id" style="display:none; margin-top:10px;">
+            <strong>Your Message:</strong>
+            <p>@book.ReportMessage</p>
+        </div>
+    </div>
+}
+
+<script>
+    function toggleReport(id) {
+        var el = document.getElementById("report-" + id);
+        el.style.display = (el.style.display === "none") ? "block" : "none";
+    }
+</script>

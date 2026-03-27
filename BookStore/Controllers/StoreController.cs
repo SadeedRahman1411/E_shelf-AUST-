@@ -195,5 +195,27 @@ namespace BookStore.Controllers
 
             return RedirectToAction("Details", new { id = id });
         }
+
+        public async Task<IActionResult> ReportDetails(int id)
+        {
+            var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book == null)
+                return NotFound();
+
+            return View(book);
+        }
+
+        [Authorize(Roles = "Reader")]
+        public async Task<IActionResult> MyReports()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var reports = await _context.Books
+                .Where(b => b.ReportedByUserId == userId)
+                .ToListAsync();
+
+            return View(reports);
+        }
     }
 }

@@ -125,7 +125,33 @@
                             }
                         }
 
+                        @if (User.IsInRole("Reader") && !isOwned)
+                        {
+                            // already reported?
+                            if (Model.ReportedByUserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                            {
+                                <button class="btn btn-outline-warning btn-lg px-4" disabled>
+                                    <i class="fa-solid fa-flag"></i> Reported
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-warning btn-lg px-4" onclick="openReportModal()">
+                                    <i class="fa-solid fa-flag"></i> Report Book
+                                </button>
+                            }
+                        }
+
                     </div>
+
+                    @if (User.IsInRole("Reader") &&
+                         Model.ReportedByUserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value &&
+                         !string.IsNullOrEmpty(Model.ReportMessage))
+                    {
+                        <div class="alert alert-warning mt-3">
+                            <strong>Your Report:</strong> @Model.ReportMessage
+                        </div>
+                    }
 
                     <hr />
 
@@ -277,12 +303,8 @@ else
         width: 100%;
         height: 100%;
         background: rgba(0,0,0,0.4); /* dark overlay */
-
         z-index: 9999;
-        display: flex;
-        justify-content: flex-end;
-        align-items: flex-end;
-        padding: 20px;
+
     }
 
     .report-box {
@@ -296,7 +318,10 @@ else
 
 <script>
     function openReportModal() {
-        document.getElementById("reportModal").style.display = "block";
+        const modal = document.getElementById("reportModal");
+        modal.style.display = "flex"; // important
+        modal.style.justifyContent = "flex-end";
+        modal.style.alignItems = "flex-end";
     }
 
     function closeReportModal() {

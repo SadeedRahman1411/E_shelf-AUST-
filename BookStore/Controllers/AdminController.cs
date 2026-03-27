@@ -113,6 +113,7 @@ namespace BookStore.Controllers
                 book.Status = BookStatus.Allowed;
 
                 var publisherId = book.PublisherId;
+                var reporterId = book.ReportedByUserId;
 
                 _context.Notifications.Add(new Notification
                 {
@@ -120,6 +121,16 @@ namespace BookStore.Controllers
                     Message = $"Your book '{book.Title}' has been unbanned",
                     Link = "/Books/Details/" + book.Id
                 });
+
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = reporterId,
+                    Message = $"Book '{book.Title}' you reported has been unbanned"
+                });
+
+                book.ReportMessage = null;
+                book.ReportedByUserId = null;
+
 
                 await _context.SaveChangesAsync();
             }

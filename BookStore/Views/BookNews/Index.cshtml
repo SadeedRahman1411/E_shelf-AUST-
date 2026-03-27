@@ -1,4 +1,5 @@
 ﻿@model List<BookStore.Models.BookNews>
+@using System.Text.Json
 
 <h2>📢 Book News</h2>
 <hr />
@@ -18,7 +19,6 @@
                     <h5>@item.Title</h5>
                     <p>@item.Description</p>
 
-                    <!-- 🔥 LIKE / DISLIKE WITH COUNT -->
                     <div class="mt-2">
 
                         @{
@@ -32,22 +32,20 @@
                         }
 
                         <!-- 👍 LIKE -->
-                        <form asp-action="React" asp-controller="BookNews" method="post" style="display:inline;">
-                            <input type="hidden" name="newsId" value="@item.Id" />
-                            <input type="hidden" name="isLike" value="true" />
-                            <button type="submit" class="btn btn-sm btn-outline-success">
-                                👍 @likeCount
-                            </button>
-                        </form>
+                        <button class="btn btn-sm btn-outline-success"
+                                onclick="react(@item.Id, true, this)"
+                                onmouseover="showUsers(@item.Id, this, true)"
+                                onmouseout="hideUsers()">
+                            👍 <span class="like-count">@likeCount</span>
+                        </button>
 
                         <!-- 👎 DISLIKE -->
-                        <form asp-action="React" asp-controller="BookNews" method="post" style="display:inline;">
-                            <input type="hidden" name="newsId" value="@item.Id" />
-                            <input type="hidden" name="isLike" value="false" />
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                👎 @dislikeCount
-                            </button>
-                        </form>
+                        <button class="btn btn-sm btn-outline-danger"
+                                onclick="react(@item.Id, false, this)"
+                                onmouseover="showUsers(@item.Id, this, false)"
+                                onmouseout="hideUsers()">
+                            👎 <span class="dislike-count">@dislikeCount</span>
+                        </button>
 
                     </div>
 
@@ -61,3 +59,59 @@
         </div>
     }
 </div>
+
+<!-- 🔥 TOOLTIP -->
+<div id="userTooltip" style="
+    position:absolute;
+    display:none;
+    background:#222;
+    color:white;
+    padding:10px;
+    border-radius:8px;
+    font-size:12px;
+    z-index:999;">
+</div>
+
+<script>
+    const likedUsers = @Html.Raw(JsonSerializer.Serialize(ViewBag.LikedUsers));
+    const dislikedUsers = @Html.Raw(JsonSerializer.Serialize(ViewBag.DislikedUsers));
+
+    function react(newsId, isLike, btn) {
+        fetch('/BookNews/React', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `newsId=${newsId}&isLike=${isLike}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            const card = btn.closest('.card');
+
+            card.querySelector('.like-count').innerText = data.likeCount;
+            card.querySelector('.dislike-count').innerText = data.dislikeCount;
+        });
+    }
+
+    function showUsers(newsId, btn, isLike) {
+        const tooltip = document.getElementById("userTooltip");
+
+        let users = isLike ? likedUsers[newsId] : dislikedUsers[newsId];
+
+        if (users && users.length > 0) {
+            tooltip.innerHTML = users.join("<br>");
+        } else {
+            tooltip.innerHTML = "No reactions yet";
+        }
+
+        tooltip.style.display = "block";
+
+        const rect = btn.getBoundingClientRect();
+        tooltip.style.left = rect.left + "px";
+        tooltip.style.top = (rect.top - 40) + "px";
+    }
+
+    function hideUsers() {
+        document.getElementById("userTooltip").style.display = "none";
+    }
+</script>

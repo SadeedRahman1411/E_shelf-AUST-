@@ -3,6 +3,7 @@ using BookStore.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Controllers
 {
@@ -15,7 +16,7 @@ namespace BookStore.Controllers
             _context = context;
         }
 
-        // 📢 SHOW ALL NEWS (FOR EVERYONE)
+        // 📢 SHOW ALL NEWS
         [AllowAnonymous]
         public IActionResult Index()
         {
@@ -23,45 +24,78 @@ namespace BookStore.Controllers
                 .OrderByDescending(n => n.CreatedAt)
                 .ToList();
 
-            // 🔥 LIKE COUNT
+            // 👍 Like count
             ViewBag.LikeCounts = _context.Reactions
                 .Where(r => r.IsLike)
                 .GroupBy(r => r.BookNewsId)
                 .ToDictionary(g => g.Key, g => g.Count());
 
-            // 🔥 DISLIKE COUNT
+            // 👎 Dislike count
             ViewBag.DislikeCounts = _context.Reactions
                 .Where(r => !r.IsLike)
                 .GroupBy(r => r.BookNewsId)
                 .ToDictionary(g => g.Key, g => g.Count());
 
+            // 👍 Users who liked (SAFE NULL HANDLING)
+            ViewBag.LikedUsers = _context.Reactions
+                .Include(r => r.User)
+                .Where(r => r.IsLike)
+                .AsEnumerable()
+                .Select(r => new
+                {
+                    r.BookNewsId,
+                    UserName = r.User != null && r.User.UserName != null
+                        ? r.User.UserName.Split('@')[0]
+                        : "User"
+                })
+                .GroupBy(x => x.BookNewsId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => x.UserName).ToList()
+                );
+
+            // 👎 Users who disliked
+            ViewBag.DislikedUsers = _context.Reactions
+                .Include(r => r.User)
+                .Where(r => !r.IsLike)
+                .AsEnumerable()
+                .Select(r => new
+                {
+                    r.BookNewsId,
+                    UserName = r.User != null && r.User.UserName != null
+                        ? r.User.UserName.Split('@')[0]
+                        : "User"
+                })
+                .GroupBy(x => x.BookNewsId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => x.UserName).ToList()
+                );
+
             return View(newsList);
         }
 
-        // 📄 SHOW CREATE FORM (ONLY PUBLISHER)
+        // 📄 CREATE PAGE
         [Authorize(Roles = "Publisher")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // 💾 SAVE NEWS (ONLY PUBLISHER)
+        // 💾 SAVE NEWS
         [HttpPost]
         [Authorize(Roles = "Publisher")]
-        public async Task<IActionResult> Create(BookNews news, IFormFile imageFile)
+        public async Task<IActionResult> Create(BookNews news, IFormFile? imageFile)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // 📸 Image upload
             if (imageFile != null && imageFile.Length > 0)
             {
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
                 var filePath = Path.Combine("wwwroot/images", fileName);
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageFile.CopyToAsync(stream);
-                }
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await imageFile.CopyToAsync(stream);
 
                 news.ImageUrl = "/images/" + fileName;
             }
@@ -75,7 +109,7 @@ namespace BookStore.Controllers
             return RedirectToAction("Index");
         }
 
-        // 👍👎 REACTION SYSTEM
+        // 👍👎 REACTION SYSTEM (AJAX)
         [HttpPost]
         [Authorize]
         public IActionResult React(int newsId, bool isLike)
@@ -87,25 +121,31 @@ namespace BookStore.Controllers
 
             if (existing != null)
             {
-                // 🔁 Update reaction
-                existing.IsLike = isLike;
+                if (existing.IsLike == isLike)
+                {
+                    _context.Reactions.Remove(existing);
+                }
+                else
+                {
+                    existing.IsLike = isLike;
+                }
             }
             else
             {
-                // ➕ Add new reaction
-                var reaction = new Reaction
+                _context.Reactions.Add(new Reaction
                 {
                     BookNewsId = newsId,
-                    UserId = userId,
+                    UserId = userId!,
                     IsLike = isLike
-                };
-
-                _context.Reactions.Add(reaction);
+                });
             }
 
             _context.SaveChanges();
 
-            return RedirectToAction("Index");
+            var likeCount = _context.Reactions.Count(r => r.BookNewsId == newsId && r.IsLike);
+            var dislikeCount = _context.Reactions.Count(r => r.BookNewsId == newsId && !r.IsLike);
+
+            return Json(new { likeCount, dislikeCount });
         }
     }
 }

@@ -33,7 +33,7 @@ namespace BookStore.Models
         public string? Author { get; set; }
 
         // ✅ NEW FIELD (AI Recommendation base)
-        [Required]
+        //[Required]
         public string? Genre { get; set; }
 
         // ✅ NEW FIELD (AI Recommendation base)

@@ -419,3 +419,4 @@ FodyWeavers.xsd
 
 # Google credentials
 Bookstore/wwwroot/credentials/
+Bookstore/Migrations

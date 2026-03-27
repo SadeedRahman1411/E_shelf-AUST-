@@ -16,11 +16,12 @@ namespace BookStore.Controllers
 
         public IActionResult Index()
         {
+           /*
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToPage("/Account/Login", new { area = "Identity" });
             }
-
+           */
             if (User.IsInRole("Publisher"))
             {
                 return RedirectToAction("Index", "Books");

@@ -65,43 +65,63 @@
                         }
                         else
                         {
-
-                            @if (User.IsInRole("Reader"))
+                            // 🔴 ADMIN → ONLY PDF
+                            if (User.IsInRole("Admin"))
                             {
-                                @if (CartService.IsBookInCart(Model.Id))
+                                @if (!string.IsNullOrEmpty(Model.PdfUrl))
+                                {
+                                    <a href="@Model.PdfUrl"
+                                           target="_blank"
+                                           class="btn btn-outline-danger btn-lg px-4">
+                                        <i class="fa-solid fa-file-pdf me-2"></i>View PDF
+                                    </a>
+                                }
+                            }
+
+                            // 🟢 READER (NOT OWNED)
+                            else if (User.IsInRole("Reader"))
+                            {
+                                if (CartService.IsBookInCart(Model.Id))
                                 {
                                     <a asp-controller="Cart"
-                                       asp-action="Index"
-                                       class="btn btn-outline-primary btn-lg px-4">
-                                        <i class="fa-solid fa-circle-check me-2"></i>In Cart
+                                           asp-action="Index"
+                                           class="btn btn-outline-primary btn-lg px-4">
+                                        In Cart
                                     </a>
                                 }
                                 else
                                 {
                                     <a asp-controller="Cart"
-                                       asp-action="AddToCart"
-                                       asp-route-id="@Model.Id"
-                                       class="btn btn-primary btn-lg px-4">
-                                        <i class="fa-solid fa-cart-arrow-down me-2"></i>Add to Cart
+                                           asp-action="AddToCart"
+                                           asp-route-id="@Model.Id"
+                                           class="btn btn-primary btn-lg px-4">
+                                        Add to Cart
                                     </a>
                                 }
+
                                 <form asp-controller="Cart" asp-action="PurchaseSingle" method="post">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="bookId" value="@Model.Id" />
                                     <button type="submit" class="btn btn-success btn-lg px-4">
-                                        <i class="fa-solid fa-bag-shopping me-2"></i>Purchase Now
+                                        Purchase Now
                                     </button>
                                 </form>
                             }
 
-                            @if (User.IsInRole("Reader") && Model.Status == BookStore.Models.BookStatus.Allowed)
+                            // ⚪ GUEST
+                            else
                             {
-                                
-                                <button type="button"
-                                        class="btn btn-warning btn-lg px-4"
-                                        onclick="openReportModal()">
-                                    <i class="fa-solid fa-flag me-2"></i>Report Book
-                                </button>
+                                <a asp-area="Identity"
+                                       asp-page="/Account/Login"
+                                       class="btn btn-primary btn-lg px-4">
+                                    Add to Cart
+                                </a>
+
+                                <a asp-area="Identity"
+                                       asp-page="/Account/Login"
+                                       class="btn btn-success btn-lg px-4">
+                                    Purchase Now
+                                </a>
                             }
                         }
 

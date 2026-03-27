@@ -9,7 +9,8 @@ using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
-    [Authorize(Roles = "Reader,Admin")]
+    //[Authorize(Roles = "Reader,Admin")]
+    [AllowAnonymous]
     public class StoreController : Controller
     {
         private readonly BookStoreContext _context;
@@ -19,6 +20,16 @@ namespace BookStore.Controllers
         {
             _context = context;
             _userManager = userManager;
+        }
+
+        public override void OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext context)
+        {
+            if (User.IsInRole("Publisher"))
+            {
+                context.Result = RedirectToAction("Index", "Books");
+            }
+
+            base.OnActionExecuting(context);
         }
 
         public async Task<IActionResult> Index(string searchString, int page = 1)

@@ -113,9 +113,22 @@
                             }
                             else
                             {
-                                @if (User.IsInRole("Reader"))
+                                if (User.IsInRole("Admin"))
                                 {
-                                    @if (CartService.IsBookInCart(item.Id))
+                                    @if (!string.IsNullOrEmpty(item.PdfUrl))
+                                    {
+                                        <a href="@item.PdfUrl"
+                                               target="_blank"
+                                               class="btn btn-outline-danger btn-sm">
+                                            <i class="fa-solid fa-file-pdf"></i> View PDF
+                                        </a>
+                                    }
+                                }
+
+                                // 🟢 READER
+                                else if (User.IsInRole("Reader"))
+                                {
+                                    if (CartService.IsBookInCart(item.Id))
                                     {
                                         <a asp-controller="Cart"
                                                asp-action="Index"
@@ -140,6 +153,22 @@
                                             <i class="fa-solid fa-bag-shopping me-2"></i>Purchase Now
                                         </button>
                                     </form>
+                                }
+
+                                // ⚪ GUEST
+                                else
+                                {
+                                    <a asp-area="Identity"
+                                           asp-page="/Account/Login"
+                                           class="btn btn-danger btn-sm">
+                                        <i class="fa-solid fa-cart-arrow-down"></i> Add to Cart
+                                    </a>
+
+                                    <a asp-area="Identity"
+                                           asp-page="/Account/Login"
+                                           class="btn btn-success btn-sm">
+                                        <i class="fa-solid fa-bag-shopping me-2"></i>Purchase Now
+                                    </a>
                                 }
                             }
 

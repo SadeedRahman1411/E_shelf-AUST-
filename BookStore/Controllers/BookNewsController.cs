@@ -36,14 +36,13 @@ namespace BookStore.Controllers
                 .GroupBy(r => r.BookNewsId)
                 .ToDictionary(g => g.Key, g => g.Count());
 
-            // 🔥 👉 Comment er kaj
+            // 💬 COMMENTS (🔥 THIS IS WHAT YOU ASKED)
             ViewBag.Comments = _context.Comments
                 .Include(c => c.User)
                 .OrderBy(c => c.CreatedAt)
                 .ToList();
 
-
-            // 👍 Users who liked (SAFE NULL HANDLING)
+            // 👍 Users who liked
             ViewBag.LikedUsers = _context.Reactions
                 .Include(r => r.User)
                 .Where(r => r.IsLike)
@@ -155,6 +154,7 @@ namespace BookStore.Controllers
             return Json(new { likeCount, dislikeCount });
         }
 
+        // 💬 NORMAL COMMENT (fallback)
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> AddComment(int newsId, string content, int? parentCommentId)
@@ -177,6 +177,55 @@ namespace BookStore.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
+        }
+
+        // ⚡ AJAX COMMENT (MAIN SYSTEM)
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddCommentAjax(int newsId, string content, int? parentCommentId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(content))
+                return Json(new { success = false });
+
+            var comment = new Comment
+            {
+                BookNewsId = newsId,
+                UserId = userId!,
+                Content = content,
+                ParentCommentId = parentCommentId,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+
+            var user = await _context.Users.FindAsync(userId);
+
+            return Json(new
+            {
+                success = true,
+                username = user?.UserName?.Split('@')[0] ?? "User",
+                content = comment.Content,
+                commentId = comment.Id,
+                parentId = comment.ParentCommentId
+            });
+        }
+
+        // ❌ DELETE COMMENT
+        [HttpPost]
+        public IActionResult DeleteComment(int id)
+        {
+            var comment = _context.Comments.Find(id);
+
+            if (comment != null)
+            {
+                _context.Comments.Remove(comment);
+                _context.SaveChanges();
+            }
+
+            return Json(new { success = true });
         }
     }
 }

@@ -331,6 +331,30 @@ namespace BookStore.Migrations
                     b.ToTable("Reactions");
                 });
 
+            modelBuilder.Entity("BookStore.Models.Receipt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Receipts");
+                });
+
             modelBuilder.Entity("BookStore.Models.Review", b =>
                 {
                     b.Property<int>("Id")

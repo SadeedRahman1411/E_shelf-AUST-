@@ -43,6 +43,8 @@ builder.Services.AddAuthorization();
 //new stuff
 builder.Services.AddScoped<Cart>(sp => Cart.GetCart(sp));
 
+builder.Services.AddScoped<PdfService>();
+
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>

@@ -50,5 +50,7 @@ namespace BookStore.Data
         public DbSet<UserPreference> UserPreferences { get; set; }
 
         public DbSet<Notification> Notifications { get; set; }
+
+        public DbSet<Receipt> Receipts { get; set; }
     }
 }

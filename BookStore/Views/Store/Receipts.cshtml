@@ -1,0 +1,14 @@
+﻿@model List<BookStore.Models.Receipt>
+
+<h2>My Receipts</h2>
+
+@foreach (var r in Model)
+{
+    <div class="card p-3 mb-3">
+        <p><strong>Date:</strong> @r.CreatedAt</p>
+
+        <a href="@r.FileUrl" target="_blank" class="btn btn-primary">
+            Download Receipt
+        </a>
+    </div>
+}

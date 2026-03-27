@@ -1,11 +1,12 @@
 ﻿using BookStore.Data;
 using BookStore.Models;
+using BookStore.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Stripe.Checkout;
 using Stripe;
+using Stripe.Checkout;
 
 
 namespace BookStore.Controllers
@@ -16,12 +17,16 @@ namespace BookStore.Controllers
         private readonly BookStoreContext _context;
         private readonly Cart _cart;
         private readonly UserManager<DefaultUser> _userManager;
+        private readonly PdfService _pdfService;
+        private readonly GoogleDriveService _driveService;
 
-        public CartController(BookStoreContext context, Cart cart, UserManager<DefaultUser> userManager)
+        public CartController(BookStoreContext context, Cart cart, UserManager<DefaultUser> userManager,PdfService pdfService,GoogleDriveService driveService)
         {
             _cart = cart;
             _context = context;
             _userManager = userManager;
+            _pdfService = pdfService;
+            _driveService = driveService;
         }
 
         public IActionResult Index()
@@ -206,6 +211,28 @@ namespace BookStore.Controllers
                 _context.CartItems.Remove(item);
             }
 
+            var userName = user.UserName;
+
+            var bookNames = cartItems.Select(c => c.Book.Title).ToList();
+            var total = cartItems.Sum(c => c.Book.Price);
+
+            // Generate PDF
+            var pdfBytes = _pdfService.GenerateReceipt(userName, bookNames, total);
+
+            // Upload to Google Drive
+            var fileName = $"receipt_{Guid.NewGuid()}.pdf";
+
+            using var stream = new MemoryStream(pdfBytes);
+
+            var fileUrl = await _driveService.UploadFileAsync(stream, fileName, "application/pdf");
+
+            // Save receipt
+            _context.Receipts.Add(new Receipt
+            {
+                UserId = userId,
+                FileUrl = fileUrl
+            });
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction("PurchasedBooks", "Reader");
@@ -272,6 +299,25 @@ namespace BookStore.Controllers
 
                 if (publisher != null)
                     publisher.Wallet += book.Price;
+
+                var userName = user.UserName;
+
+                var bookNames = new List<string> { book.Title };
+                var total = book.Price;
+
+                var pdfBytes = _pdfService.GenerateReceipt(userName, bookNames, total);
+
+                var fileName = $"receipt_{Guid.NewGuid()}.pdf";
+
+                using var stream = new MemoryStream(pdfBytes);
+
+                var fileUrl = await _driveService.UploadFileAsync(stream, fileName, "application/pdf");
+
+                _context.Receipts.Add(new Receipt
+                {
+                    UserId = userId,
+                    FileUrl = fileUrl
+                });
 
                 await _context.SaveChangesAsync();
             }

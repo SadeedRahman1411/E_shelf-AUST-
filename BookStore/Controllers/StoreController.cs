@@ -217,5 +217,18 @@ namespace BookStore.Controllers
 
             return View(reports);
         }
+
+        [Authorize(Roles = "Reader")]
+        public async Task<IActionResult> Receipts()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var receipts = await _context.Receipts
+                .Where(r => r.UserId == userId)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
+            return View(receipts);
+        }
     }
 }

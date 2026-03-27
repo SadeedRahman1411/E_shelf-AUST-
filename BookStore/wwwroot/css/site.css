@@ -39,3 +39,112 @@ body {
     border-radius: 50%;
     border: 3px solid #007bff;
 }
+
+/* 🌟 NAVBAR - LIGHT MODERN */
+.custom-navbar {
+    background: #f4f8ff; /* soft whitish blue */
+    padding: 12px 24px;
+    border-bottom: 1px solid #e3eaf5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* 🔤 LOGO */
+.navbar-brand {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e3c72 !important;
+    letter-spacing: 0.5px;
+}
+
+/* 🔗 NAV LINKS */
+.nav-link {
+    color: #4a5a75 !important;
+    font-size: 15px;
+    margin-right: 18px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+    /* ✨ SMOOTH UNDERLINE HOVER */
+    .nav-link::after {
+        content: "";
+        position: absolute;
+        width: 0%;
+        height: 2px;
+        bottom: -4px;
+        left: 0;
+        background: #3b82f6;
+        transition: 0.3s;
+    }
+
+    .nav-link:hover::after {
+        width: 100%;
+    }
+
+    /* 🔥 HOVER TEXT */
+    .nav-link:hover {
+        color: #1e3c72 !important;
+    }
+
+    /* 🎯 ACTIVE LINK */
+    .nav-link.active {
+        color: #1e3c72 !important;
+        font-weight: 600;
+    }
+
+/* 🔵 POST BUTTON (SOFT BLUE STYLE) */
+.post-btn {
+    background: #e0edff;
+    color: #1e3c72 !important;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+    .post-btn:hover {
+        background: #cfe2ff;
+        transform: translateY(-1px);
+    }
+
+/* 🔷 LOGOUT BUTTON (KEEP BLUE AS YOU SAID) */
+.navbar .btn,
+.navbar button,
+.navbar .logout-btn {
+    background: #2563eb;
+    color: white !important;
+    border-radius: 20px;
+    padding: 6px 16px;
+    border: none;
+    transition: 0.3s;
+}
+
+    .navbar .btn:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+/* 🛒 CART ICON */
+.cart-icon {
+    font-size: 18px;
+    color: #4a5a75 !important;
+    transition: 0.3s;
+}
+
+    .cart-icon:hover {
+        color: #2563eb !important;
+        transform: scale(1.1);
+    }
+
+/* 👤 PROFILE IMAGE (if any) */
+.navbar img {
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+    .navbar img:hover {
+        transform: scale(1.1);
+    }

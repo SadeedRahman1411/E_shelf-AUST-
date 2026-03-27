@@ -4,58 +4,58 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - BookStore</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/fontawesome/css/all.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BookStore.styles.css" asp-append-version="true" />
 </head>
+
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+
+        <!-- 🔥 BEAUTIFUL NAVBAR -->
+        <nav class="navbar navbar-expand-lg custom-navbar">
             <div class="container-fluid">
+
+                <!-- 🔤 BRAND -->
                 @if (User.IsInRole("Publisher"))
                 {
-                    <a class="navbar-brand" asp-area="" asp-controller="Books" asp-action="Index">E-Shelf</a>
+                    <a class="navbar-brand" asp-controller="Books" asp-action="Index">E-Shelf</a>
                 }
                 else
                 {
-                    <a class="navbar-brand" asp-area="" asp-controller="Store" asp-action="Index">E-Shelf</a>
+                    <a class="navbar-brand" asp-controller="Store" asp-action="Index">E-Shelf</a>
                 }
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <!-- 📱 MOBILE BUTTON -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <!-- 🔗 NAV CONTENT -->
+                <div class="collapse navbar-collapse" id="navbarContent">
 
-                    <ul class="navbar-nav flex-grow-1">
+                    <!-- LEFT SIDE -->
+                    <ul class="navbar-nav me-auto">
 
-                        <!-- Reader Purchased Books -->
                         @if (User.IsInRole("Reader"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                       asp-controller="Reader"
-                                       asp-action="PurchasedBooks">
+                                <a class="nav-link" asp-controller="Reader" asp-action="PurchasedBooks">
                                     My Books
                                 </a>
                             </li>
-                            
-                             <li class="nav-item">
-                                    <a class="nav-link" asp-controller="BookNews" asp-action="Index">
-                                        Book News
-                                    </a>
-                             </li>
-                            
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="BookNews" asp-action="Index">
+                                    Book News
+                                </a>
+                            </li>
                         }
 
-                        <!-- ✅ ABOUT US RIGHT AFTER MY BOOKS -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark"
-                                   asp-controller="About"
-                                   asp-action="Index">
+                            <a class="nav-link" asp-controller="About" asp-action="Index">
                                 About Us
                             </a>
                         </li>
@@ -64,65 +64,69 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="BookNews" asp-action="Index">
-                                    📢 Book News
+                                    Book News
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="BookNews" asp-action="Create">
-                                    ➕ Post News
+                                <a class="nav-link post-btn" asp-controller="BookNews" asp-action="Create">
+                                    Post News +
                                 </a>
                             </li>
                         }
 
-                        <!-- Admin Dashboard -->
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark"
-                                       asp-controller="Admin"
-                                       asp-action="Dashboard">
+                                <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">
                                     Admin Panel
                                 </a>
                             </li>
                         }
-
                     </ul>
 
-                    <partial name="_LoginPartial" />
+                    <!-- RIGHT SIDE -->
+                    <div class="d-flex align-items-center gap-3">
 
-                    @if (User.IsInRole("Reader"))
-                    {
-                        <a class="nav-link text-dark float-right"
-                               asp-area=""
-                               asp-controller="Cart"
-                               asp-action="Index">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                        </a>
-                        
-                    }
+                        <partial name="_LoginPartial" />
+
+                        @if (User.IsInRole("Reader"))
+                        {
+                            <a class="nav-link cart-icon"
+                                   asp-controller="Cart"
+                                   asp-action="Index">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                            </a>
+                        }
+
+                    </div>
 
                 </div>
             </div>
         </nav>
+
     </header>
 
+    <!-- MAIN BODY -->
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
+    <!-- FOOTER -->
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2026 - BookStore -
-            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <a asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
 
+    <!-- SCRIPTS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

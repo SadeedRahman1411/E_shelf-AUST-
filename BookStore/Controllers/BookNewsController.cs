@@ -2,7 +2,6 @@
 using BookStore.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BookStore.Controllers
@@ -23,6 +22,18 @@ namespace BookStore.Controllers
             var newsList = _context.BookNews
                 .OrderByDescending(n => n.CreatedAt)
                 .ToList();
+
+            // 🔥 LIKE COUNT
+            ViewBag.LikeCounts = _context.Reactions
+                .Where(r => r.IsLike)
+                .GroupBy(r => r.BookNewsId)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            // 🔥 DISLIKE COUNT
+            ViewBag.DislikeCounts = _context.Reactions
+                .Where(r => !r.IsLike)
+                .GroupBy(r => r.BookNewsId)
+                .ToDictionary(g => g.Key, g => g.Count());
 
             return View(newsList);
         }
@@ -61,7 +72,39 @@ namespace BookStore.Controllers
             _context.BookNews.Add(news);
             await _context.SaveChangesAsync();
 
-            // 👉 After posting → go to News Feed
+            return RedirectToAction("Index");
+        }
+
+        // 👍👎 REACTION SYSTEM
+        [HttpPost]
+        [Authorize]
+        public IActionResult React(int newsId, bool isLike)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var existing = _context.Reactions
+                .FirstOrDefault(r => r.BookNewsId == newsId && r.UserId == userId);
+
+            if (existing != null)
+            {
+                // 🔁 Update reaction
+                existing.IsLike = isLike;
+            }
+            else
+            {
+                // ➕ Add new reaction
+                var reaction = new Reaction
+                {
+                    BookNewsId = newsId,
+                    UserId = userId,
+                    IsLike = isLike
+                };
+
+                _context.Reactions.Add(reaction);
+            }
+
+            _context.SaveChanges();
+
             return RedirectToAction("Index");
         }
     }

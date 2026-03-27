@@ -42,6 +42,8 @@ namespace BookStore.Data
 
         public DbSet<BookNews> BookNews { get; set; }
 
+        public DbSet<Reaction> Reactions { get; set; }
+
         // ✅ NEW TABLE FOR AI
         public DbSet<UserPreference> UserPreferences { get; set; }
     }

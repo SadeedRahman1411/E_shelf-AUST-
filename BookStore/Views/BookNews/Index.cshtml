@@ -18,6 +18,41 @@
                     <h5>@item.Title</h5>
                     <p>@item.Description</p>
 
+                    <!-- 🔥 LIKE / DISLIKE WITH COUNT -->
+                    <div class="mt-2">
+
+                        @{
+                            var likeCount = ViewBag.LikeCounts != null && ViewBag.LikeCounts.ContainsKey(item.Id)
+                                ? ViewBag.LikeCounts[item.Id]
+                                : 0;
+
+                            var dislikeCount = ViewBag.DislikeCounts != null && ViewBag.DislikeCounts.ContainsKey(item.Id)
+                                ? ViewBag.DislikeCounts[item.Id]
+                                : 0;
+                        }
+
+                        <!-- 👍 LIKE -->
+                        <form asp-action="React" asp-controller="BookNews" method="post" style="display:inline;">
+                            <input type="hidden" name="newsId" value="@item.Id" />
+                            <input type="hidden" name="isLike" value="true" />
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                👍 @likeCount
+                            </button>
+                        </form>
+
+                        <!-- 👎 DISLIKE -->
+                        <form asp-action="React" asp-controller="BookNews" method="post" style="display:inline;">
+                            <input type="hidden" name="newsId" value="@item.Id" />
+                            <input type="hidden" name="isLike" value="false" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                👎 @dislikeCount
+                            </button>
+                        </form>
+
+                    </div>
+
+                    <br />
+
                     <small class="text-muted">
                         Posted on @item.CreatedAt.ToShortDateString()
                     </small>

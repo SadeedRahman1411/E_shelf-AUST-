@@ -44,20 +44,25 @@ namespace BookStore.Controllers
                 var publisherId = book.PublisherId;
 
                 // reporter
-                _context.Notifications.Add(new Notification
+                if (!string.IsNullOrEmpty(reporterId))
                 {
-                    UserId = reporterId,
-                    Message = $"Your report for '{book.Title}' was accepted",
-                    //Link = "/Store/Details/" + book.Id
-                });
-
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = reporterId,
+                        Message = $"Your report for '{book.Title}' was accepted",
+                        //Link = "/Store/Details/" + book.Id
+                    });
+                }
                 // publisher
-                _context.Notifications.Add(new Notification
+                if (!string.IsNullOrEmpty(publisherId))
                 {
-                    UserId = publisherId,
-                    Message = $"Your book '{book.Title}' was reported and accepted",
-                    Link = "/Books/Details/" + book.Id
-                });
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = publisherId,
+                        Message = $"Your book '{book.Title}' was reported and accepted",
+                        Link = "/Books/Details/" + book.Id
+                    });
+                }
 
                 await _context.SaveChangesAsync();
             }
@@ -115,12 +120,15 @@ namespace BookStore.Controllers
                 var publisherId = book.PublisherId;
                 var reporterId = book.ReportedByUserId;
 
-                _context.Notifications.Add(new Notification
+                if (!string.IsNullOrEmpty(publisherId))
                 {
-                    UserId = publisherId,
-                    Message = $"Your book '{book.Title}' has been unbanned",
-                    Link = "/Books/Details/" + book.Id
-                });
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = publisherId,
+                        Message = $"Your book '{book.Title}' has been unbanned",
+                        Link = "/Books/Details/" + book.Id
+                    });
+                }
 
                 _context.Notifications.Add(new Notification
                 {

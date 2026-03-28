@@ -76,8 +76,9 @@ namespace BookStore.Controllers
                 {
                     // ✅ NORMALIZE OUTSIDE QUERY (IMPORTANT FIX)
                     var normalizedGenres = userGenres
-                        .Select(g => g.Trim().ToLower())
-                        .ToList();
+     .Where(g => !string.IsNullOrEmpty(g))
+     .Select(g => g.Trim().ToLower())
+     .ToList();
 
                     var allBooks = await _context.Books
                         .Where(b => (b.Status == BookStatus.Allowed || b.Status == BookStatus.Reported))
@@ -86,7 +87,8 @@ namespace BookStore.Controllers
                     // ✅ FILTER IN MEMORY (100% RELIABLE)
                     var recommendedBooks = allBooks
                         .Where(b =>
-                            normalizedGenres.Contains(b.Genre.Trim().ToLower()) &&
+                            b.Genre != null &&
+normalizedGenres.Contains(b.Genre.Trim().ToLower()) &&
                             !purchasedIds.Contains(b.Id))
                         .ToList();
 

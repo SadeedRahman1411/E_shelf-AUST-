@@ -22,7 +22,9 @@ namespace BookStore.Services
         {
             var uploadParams = new RawUploadParams()
             {
-                File = new FileDescription(fileName, fileStream)
+                File = new FileDescription(fileName, fileStream),
+                Type = "upload",          // ensures public access
+                AccessMode = "public"
             };
 
             var result = await _cloudinary.UploadAsync(uploadParams);

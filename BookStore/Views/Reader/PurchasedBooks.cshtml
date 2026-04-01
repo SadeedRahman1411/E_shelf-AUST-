@@ -45,10 +45,10 @@ else
                     <td>
                         @if (!string.IsNullOrEmpty(book.PdfUrl))
                         {
-                            <a href="@book.PdfUrl"
+                            <a href="@($"{book.PdfUrl}#toolbar=1&navpanes=0&scrollbar=1")"
                                target="_blank"
-                               class="btn btn-sm btn-outline-danger"
-                               referrerpolicy="no-referrer">
+                               rel="noopener noreferrer"
+                               class="btn btn-sm btn-outline-danger">
                                 <i class="fa-solid fa-file-pdf me-1"></i>View PDF
                             </a>
                         }

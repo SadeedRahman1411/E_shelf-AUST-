@@ -25,7 +25,15 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<BookStoreContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("BookStoreContext")
-        ?? throw new InvalidOperationException("Connection string 'BookStoreContext' not found.")
+        ?? throw new InvalidOperationException("Connection string 'BookStoreContext' not found."),
+        sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null
+            );
+        }
     )
 );
 

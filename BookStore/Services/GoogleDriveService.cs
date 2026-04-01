@@ -29,25 +29,17 @@ namespace BookStore.Services
         {
             if (_driveService != null) return _driveService;
 
-            var credPath = Path.Combine(_env.WebRootPath, "credentials", "oauth-client.json");
+            var json = Environment.GetEnvironmentVariable("GOOGLE_DRIVE_CREDENTIALS");
 
-            if (!System.IO.File.Exists(credPath))
-                throw new FileNotFoundException($"JSON file not found at {credPath}");
+            if (string.IsNullOrEmpty(json))
+                throw new Exception("Google Drive credentials not found in environment variables");
 
-            UserCredential credential;
-            using (var stream = new FileStream(credPath, FileMode.Open, FileAccess.Read))
+            GoogleCredential credential;
+
+            using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(json)))
             {
-                // Keeping the fixed port 5000 to prevent future "policy" errors
-                var receiver = new LocalServerCodeReceiver("http://127.0.0.1:5000/authorize/");
-
-                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.FromStream(stream).Secrets,
-                    new[] { DriveService.Scope.DriveFile, DriveService.Scope.Drive },
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore("Drive.Api.Token"),
-                    receiver
-                );
+                credential = GoogleCredential.FromStream(stream)
+                    .CreateScoped(DriveService.Scope.Drive);
             }
 
             _driveService = new DriveService(new BaseClientService.Initializer()

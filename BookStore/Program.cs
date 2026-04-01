@@ -61,6 +61,14 @@ builder.Services.AddScoped<GoogleDriveService>();
 // Build the app
 var app = builder.Build();
 
+// ✅ FIRST: Run migrations
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<BookStoreContext>();
+    context.Database.Migrate();
+}
+
+// ✅ THEN: Create roles
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -76,14 +84,12 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Seed database
+// ✅ THEN: Seed data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<BookStoreContext>();
-        context.Database.Migrate();
         SeedData.Initialize(services);
     }
     catch (Exception ex)

@@ -20,12 +20,12 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<DefaultUser> _userManager;
         private readonly SignInManager<DefaultUser> _signInManager;
-        private readonly GoogleDriveService _driveService;
+        private readonly CloudinaryService _driveService;
 
         public IndexModel(
             UserManager<DefaultUser> userManager,
             SignInManager<DefaultUser> signInManager,
-            GoogleDriveService driveService)
+            CloudinaryService driveService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -80,7 +80,7 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
             [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Last name must contain only alphabets.")]
             public string LastName { get; set; }
 
-
+             
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
@@ -174,9 +174,8 @@ namespace BookStore.Areas.Identity.Pages.Account.Manage
                 using var stream = Input.ProfileImageFile.OpenReadStream();
 
                 string imageUrl = await _driveService.UploadFileAsync(
-                    stream,
-                    fileName,
-                    Input.ProfileImageFile.ContentType);
+     stream,
+     fileName);
 
                 user.ProfileImageUrl = imageUrl;
             }

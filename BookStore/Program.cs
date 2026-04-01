@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Google;
 using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +37,13 @@ builder.Services.AddIdentity<DefaultUser, IdentityRole>(options =>
 .AddDefaultTokenProviders()
 .AddDefaultUI();
 
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Google:ClientSecret"];
+    });
+
 builder.Services.AddAuthorization();
 
 //new stuff
@@ -56,7 +64,9 @@ builder.Services.AddSession(options =>
 //new stuff
 
 // Register GoogleDriveService (ONLY ONCE)
-builder.Services.AddScoped<GoogleDriveService>();
+//builder.Services.AddScoped<CloudinaryService>();
+
+builder.Services.AddScoped<CloudinaryService>();
 
 // Build the app
 var app = builder.Build();

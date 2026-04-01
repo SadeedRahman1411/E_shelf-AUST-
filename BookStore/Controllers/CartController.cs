@@ -18,9 +18,9 @@ namespace BookStore.Controllers
         private readonly Cart _cart;
         private readonly UserManager<DefaultUser> _userManager;
         private readonly PdfService _pdfService;
-        private readonly GoogleDriveService _driveService;
+        private readonly CloudinaryService _driveService;
 
-        public CartController(BookStoreContext context, Cart cart, UserManager<DefaultUser> userManager,PdfService pdfService,GoogleDriveService driveService)
+        public CartController(BookStoreContext context, Cart cart, UserManager<DefaultUser> userManager,PdfService pdfService,CloudinaryService driveService)
         {
             _cart = cart;
             _context = context;
@@ -151,7 +151,7 @@ namespace BookStore.Controllers
             if (!cartItems.Any())
                 return RedirectToAction("Index");
 
-            var domain = "https://localhost:7198";
+            var domain = $"{Request.Scheme}://{Request.Host}";
 
             var options = new SessionCreateOptions
             {
@@ -224,7 +224,7 @@ namespace BookStore.Controllers
 
             using var stream = new MemoryStream(pdfBytes);
 
-            var fileUrl = await _driveService.UploadFileAsync(stream, fileName, "application/pdf");
+            var fileUrl = await _driveService.UploadFileAsync(stream, fileName);
 
             // Save receipt
             _context.Receipts.Add(new Receipt
@@ -311,7 +311,7 @@ namespace BookStore.Controllers
 
                 using var stream = new MemoryStream(pdfBytes);
 
-                var fileUrl = await _driveService.UploadFileAsync(stream, fileName, "application/pdf");
+                var fileUrl = await _driveService.UploadFileAsync(stream, fileName);
 
                 _context.Receipts.Add(new Receipt
                 {

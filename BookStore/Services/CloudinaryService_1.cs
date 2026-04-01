@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 
 namespace BookStore.Services
 {
-    public class GoogleDriveService
+    public class CloudinaryService
     {
         // 1. Your specific Folder ID is now set here
         private readonly string _folderId = "14iD3o18kruXZG1kNAHSUrfO52ptZpk3n";
         private readonly IWebHostEnvironment _env;
         private DriveService _driveService;
 
-        public GoogleDriveService(IWebHostEnvironment env)
+        public CloudinaryService(IWebHostEnvironment env)
         {
             _env = env;
         }

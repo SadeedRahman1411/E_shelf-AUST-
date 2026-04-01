@@ -17,9 +17,9 @@ namespace BookStore.Controllers
     public class BooksController : Controller
     {
         private readonly BookStoreContext _context;
-        private readonly GoogleDriveService _driveService;
+        private readonly CloudinaryService _driveService;
 
-        public BooksController(BookStoreContext context, GoogleDriveService driveService)
+        public BooksController(BookStoreContext context, CloudinaryService driveService)
         {
             _context = context;
             _driveService = driveService;
@@ -88,17 +88,17 @@ namespace BookStore.Controllers
                 string fileName = $"{Guid.NewGuid()}{extension}";
 
                 using var stream = imageFile.OpenReadStream();
-                string imageUrl = await _driveService.UploadFileAsync(stream, fileName, imageFile.ContentType);
+                string imageUrl = await _driveService.UploadFileAsync(stream, fileName);
 
                 book.ImageUrl = imageUrl;
             }
 
             if (pdfFile != null && pdfFile.Length > 0)
             {
+                using var pdfStream = pdfFile.OpenReadStream();
                 book.PdfUrl = await _driveService.UploadFileAsync(
-                    pdfFile.OpenReadStream(),
-                    $"{Guid.NewGuid()}.pdf",
-                    "application/pdf");
+                    pdfStream,
+                    $"{Guid.NewGuid()}.pdf");
             }
 
             _context.Add(book);
@@ -159,7 +159,7 @@ namespace BookStore.Controllers
                     string fileName = $"{existingBook.Id}_{Guid.NewGuid()}{extension}";
 
                     using var stream = imageFile.OpenReadStream();
-                    existingBook.ImageUrl = await _driveService.UploadFileAsync(stream, fileName, imageFile.ContentType);
+                    existingBook.ImageUrl = await _driveService.UploadFileAsync(stream, fileName);
                 }
 
                 // PDF update
@@ -168,7 +168,7 @@ namespace BookStore.Controllers
                     string fileName = $"{existingBook.Id}_{Guid.NewGuid()}.pdf";
 
                     using var stream = pdfFile.OpenReadStream();
-                    existingBook.PdfUrl = await _driveService.UploadFileAsync(stream, fileName, "application/pdf");
+                    existingBook.PdfUrl = await _driveService.UploadFileAsync(stream, fileName);
                 }
 
                 await _context.SaveChangesAsync();

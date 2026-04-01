@@ -1,19 +1,22 @@
 ﻿using BookStore.Data;
 using BookStore.Models;
+using BookStore.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
     public class BookNewsController : Controller
     {
         private readonly BookStoreContext _context;
+        private readonly CloudinaryService _cloudinaryService;
 
-        public BookNewsController(BookStoreContext context)
+        public BookNewsController(BookStoreContext context, CloudinaryService cloudinaryService)
         {
             _context = context;
+            _cloudinaryService = cloudinaryService;
         }
 
         // 📢 SHOW ALL NEWS
@@ -81,14 +84,14 @@ namespace BookStore.Controllers
             return View(newsList);
         }
 
-        // 📄 CREATE PAGE
+        // CREATE PAGE
         [Authorize(Roles = "Publisher")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // 💾 SAVE NEWS
+        // SAVE NEWS
         [HttpPost]
         [Authorize(Roles = "Publisher")]
         public async Task<IActionResult> Create(BookNews news, IFormFile? imageFile)
@@ -97,13 +100,11 @@ namespace BookStore.Controllers
 
             if (imageFile != null && imageFile.Length > 0)
             {
-                var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
-                var filePath = Path.Combine("wwwroot/images", fileName);
+                string extension = Path.GetExtension(imageFile.FileName);
+                string fileName = $"{Guid.NewGuid()}{extension}";
 
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await imageFile.CopyToAsync(stream);
-
-                news.ImageUrl = "/images/" + fileName;
+                using var stream = imageFile.OpenReadStream();
+                news.ImageUrl = await _cloudinaryService.UploadFileAsync(stream, fileName);  
             }
 
             news.PublisherId = userId;
@@ -115,7 +116,7 @@ namespace BookStore.Controllers
             return RedirectToAction("Index");
         }
 
-        // 👍👎 REACTION SYSTEM (AJAX)
+        //  REACTION SYSTEM (AJAX)
         [HttpPost]
         [Authorize]
         public IActionResult React(int newsId, bool isLike)

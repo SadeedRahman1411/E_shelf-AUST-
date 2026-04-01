@@ -34,6 +34,11 @@ namespace BookStore.Services
             if (result.Error != null)
                 throw new Exception(result.Error.Message);
 
+            Console.WriteLine($"=== CLOUDINARY UPLOAD ===");
+            Console.WriteLine($"Access Mode: {result.AccessMode}");
+            Console.WriteLine($"URL: {result.SecureUrl}");
+            Console.WriteLine($"Type: {result.JsonObj}");
+
             return result.SecureUrl.ToString();
         }
     }

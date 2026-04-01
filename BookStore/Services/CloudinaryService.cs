@@ -24,7 +24,9 @@ namespace BookStore.Services
             {
                 File = new FileDescription(fileName, fileStream),
                 Type = "upload",          // ensures public access
-                AccessMode = "public"
+                AccessMode = "public",
+                UseFilename = true,
+                UniqueFilename = true,
             };
 
             var result = await _cloudinary.UploadAsync(uploadParams);
